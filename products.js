@@ -77,7 +77,7 @@ const DEFAULT_BANNERS = [
     { id: 'banner-002', title: 'Reliance Independence Products', subtitle: 'Premium Quality at Wholesale Prices', image: 'banner-2.jpg', bgGradient: 'navy-green', buttonText: 'View All Products', isActive: true, order: 2, useOverlay: true }
 ];
 
-const GOOGLE_SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbw-r5Cl-YsF4hM-d62EQ1zramLiKlFzUDS_LX-AlAhlv_J6AnHHA1q4Tb_aSZtBpwXK/exec';
+const GOOGLE_SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbzzeMgJxZo17bjPYSLj4GKPdfYke1HQv9pIoJ6xZT_FK7lLgsC3aLYw802Ax1M8_h-s/exec';
 
 async function loadProductsFromGoogleSheet() {
     try {
