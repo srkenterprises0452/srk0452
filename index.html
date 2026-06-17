@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="theme-color" content="#1E3A8A" />
+    <meta name="description" content="SRK Enterprises - B2B FMCG Wholesale Ordering Portal" />
+    <title>SRK Enterprises | B2B FMCG Ordering Portal</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/png" href="logo-circle.png" />
+    <link rel="apple-touch-icon" href="logo-circle.png" />
+</head>
+<body>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <div id="loader" class="loader-overlay hidden">
+        <div class="spinner"></div>
+        <p>Loading Products...</p>
+    </div>
+
+    <!-- ========== HEADER ========== -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="header-brand" onclick="showHome()">
+                <img src="logo-circle.png" alt="SRK Enterprises" class="header-logo" />
+                <div class="header-title">
+                    <h1>SRK Enterprises</h1>
+                    <p>Connecting Markets, Creating Futures</p>
+                </div>
+            </div>
+            <button class="my-cart-btn" onclick="openCart()" aria-label="My Cart">
+                <div class="cart-icon-wrap">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="white"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                    <span class="cart-count-bubble" id="cartBadge">0</span>
+                </div>
+                <div class="my-cart-text">
+                    <span class="my-cart-label">My Cart</span>
+                    <span class="my-cart-total" id="myCartTotal">&#8377;0</span>
+                </div>
+            </button>
+        </div>
+        <div class="search-wrap">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search products, brands or categories..." oninput="handleSearch(event)" autocomplete="off" />
+                <button class="search-btn" aria-label="Search">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== DUAL FILTERS ========== -->
+    <div class="filters-wrap">
+        <div class="filter-row">
+            <span class="filter-label">Brand:</span>
+            <nav class="filter-pills" id="brandNav" aria-label="Brands"></nav>
+        </div>
+        <div class="filter-row">
+            <span class="filter-label">Category:</span>
+            <nav class="filter-pills" id="categoryNav" aria-label="Categories"></nav>
+        </div>
+        <div id="activeFilterInfo" class="active-filter-info hidden">
+            <span id="activeFilterText"></span>
+            <button class="clear-filters-btn" onclick="clearAllFilters()">Clear all</button>
+        </div>
+    </div>
+
+    <!-- ========== MAIN ========== -->
+    <main class="main-content">
+        <!-- BANNER CAROUSEL -->
+        <section class="banner-carousel" id="bannerCarousel">
+            <div class="banner-slides" id="bannerSlides"></div>
+            <button class="banner-arrow banner-prev" onclick="prevBanner()" aria-label="Previous slide">&#10094;</button>
+            <button class="banner-arrow banner-next" onclick="nextBanner()" aria-label="Next slide">&#10095;</button>
+            <div class="banner-dots" id="bannerDots"></div>
+        </section>
+
+        <div class="section-header" id="productsSection">
+            <h2 class="section-title">Our Products</h2>
+            <span class="section-count" id="resultsInfo">Showing 36 products</span>
+        </div>
+        <div class="product-grid" id="productGrid"></div>
+        <div id="emptyResults" class="empty-state hidden">
+            <div class="empty-icon">&#128269;</div>
+            <h3>No products found</h3>
+            <p>Try a different filter or search term.</p>
+        </div>
+    </main>
+
+    <!-- ========== FEATURES STRIP ========== -->
+    <section class="features-strip">
+        <div class="feature"><span class="feature-icon">&#128666;</span><div><strong>Free Delivery</strong><small>On orders above &#8377;2,000</small></div></div>
+        <div class="feature"><span class="feature-icon">&#128176;</span><div><strong>Best Prices</strong><small>Competitive wholesale rates</small></div></div>
+        <div class="feature"><span class="feature-icon">&#9989;</span><div><strong>Quality Assured</strong><small>100% genuine products</small></div></div>
+        <div class="feature"><span class="feature-icon">&#128222;</span><div><strong>Quick Support</strong><small>+91 99480 00452</small></div></div>
+    </section>
+
+    <!-- ========== BOTTOM CART (Mobile) ========== -->
+    <div id="bottomCartSummary" class="bottom-cart-summary hidden" onclick="openCart()">
+        <div class="bcs-info">
+            <span class="bcs-count" id="bcsCount">0 items</span>
+            <span class="bcs-total" id="bcsTotal">&#8377;0</span>
+        </div>
+        <div class="bcs-action">View Cart &rarr;</div>
+    </div>
+
+    <!-- ========== CART MODAL ========== -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>&#128722; Your Cart</h2>
+                <button class="modal-close" onclick="closeCart()">&times;</button>
+            </div>
+            <div class="modal-body" id="cartBody"></div>
+            <div class="modal-footer" id="cartFooter"></div>
+        </div>
+    </div>
+
+    <!-- ========== CHECKOUT MODAL ========== -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>&#128203; Retailer Details</h2>
+                <button class="modal-close" onclick="closeCheckout()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="checkoutForm" onsubmit="submitOrder(event)" novalidate>
+                    <div class="form-group"><label>Shop Name <span class="req">*</span></label><input type="text" id="shopName" required placeholder="e.g. ABC Stores" /></div>
+                    <div class="form-group"><label>Contact Person <span class="req">*</span></label><input type="text" id="contactPerson" required placeholder="e.g. Ramesh Kumar" /></div>
+                    <div class="form-group"><label>Mobile Number <span class="req">*</span></label><input type="tel" id="mobile" required pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile" /></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Area <span class="req">*</span></label><input type="text" id="area" required placeholder="e.g. Sircilla" /></div>
+                        <div class="form-group"><label>Town <span class="req">*</span></label><input type="text" id="town" required placeholder="e.g. Rajanna Sircilla" /></div>
+                    </div>
+                    <div class="form-group"><label>Remarks (Optional)</label><textarea id="remarks" rows="3" placeholder="e.g. Urgent delivery"></textarea></div>
+                    <button type="submit" class="btn-whatsapp">&#128172; Send Order via WhatsApp</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <img src="logo-circle.png" alt="SRK" class="footer-logo-img" />
+                <h3>SRK Enterprises</h3>
+                <p class="footer-tag">Connecting Markets, Creating Futures</p>
+                <p class="footer-desc">FMCG Channel Partner serving Rajanna Sircilla &amp; Siddipet regions.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Contact Us</h4>
+                <p>&#128222; <a href="tel:+919948000452">+91 99480 00452</a></p>
+                <p>&#128172; <a href="https://wa.me/919948000452" target="_blank" rel="noopener">WhatsApp Us</a></p>
+                
+            </div>
+            <div class="footer-col">
+                <h4>Useful Links</h4>
+                <p>&rsaquo; <a href="#">About Us</a></p>
+                <p>&rsaquo; <a href="#">Terms &amp; Conditions</a></p>
+                <p>&rsaquo; <a href="#">Privacy Policy</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom"><p>&copy; <span id="footerYear"></span> SRK Enterprises. All Rights Reserved.</p></div>
+    </footer>
+
+    <a class="float-whatsapp" href="https://wa.me/919948000452" target="_blank" rel="noopener" aria-label="WhatsApp">&#128172;</a>
+
+    <script src="products.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
