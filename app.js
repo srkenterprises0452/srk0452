@@ -866,3 +866,15 @@ document.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { closeCart(); closeCheckout(); }
 });
+function openImageZoom(imageUrl) {
+    const modal = document.getElementById('imageZoomModal');
+    const img = document.getElementById('zoomedImage');
+
+    img.src = imageUrl;
+    modal.classList.add('show');
+}
+
+function closeImageZoom() {
+    const modal = document.getElementById('imageZoomModal');
+    modal.classList.remove('show');
+}
