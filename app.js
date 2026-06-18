@@ -639,101 +639,159 @@ function closeCart() { document.getElementById('cartModal').classList.remove('sh
 function renderCart() {
     const body = document.getElementById('cartBody');
     const footer = document.getElementById('cartFooter');
-    const { totalUnits, totalCartonsCount, totalSinglesCount, grandTotal, totalMrp, totalSavings, lines } = getCartSummary();
+
+    const {
+        totalUnits,
+        totalCartonsCount,
+        totalSinglesCount,
+        grandTotal,
+        totalMrp,
+        totalSavings,
+        lines
+    } = getCartSummary();
 
     if (lines.length === 0) {
         body.innerHTML = `
             <div class="cart-empty">
-                <div class="empty-icon">\uD83D\uDED2</div>
+                <div class="empty-icon">🛒</div>
                 <h3>Your cart is empty</h3>
                 <p>Browse products and add items to get started.</p>
                 <button class="btn-continue" onclick="closeCart()">Continue Shopping</button>
-            </div>`;
+            </div>
+        `;
         footer.innerHTML = '';
         return;
     }
 
     body.innerHTML = lines.map(({ key, product, unitType, qty, rate, mrp, amount }) => {
-        const fallback = product.emoji || '\uD83D\uDCE6';
+        const fallback = product.emoji || '📦';
+
         const imageHtml = product.image
             ? `<img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}" onerror="this.outerHTML='${fallback}';" />`
-            : fallback;
-        const unitLabel = unitType === 'carton' ? (product.cartonType || 'Carton').toLowerCase() + 's' : 'pcs';
-        const unitsInfo = unitType === 'carton' && product.unitsPerCarton 
-            ? ` (${qty * product.unitsPerCarton} units)` 
+            : `<span class="cart-emoji">${fallback}</span>`;
+
+        const unitLabel = unitType === 'carton'
+            ? (product.cartonType || 'Carton').toLowerCase() + 's'
+            : 'pcs';
+
+        const unitsInfo = unitType === 'carton' && product.unitsPerCarton
+            ? ` (${qty * product.unitsPerCarton} units)`
             : '';
-        const teluguLine = product.nameTelugu ? `<div class="cart-item-name-te">${escapeHtml(product.nameTelugu)}</div>` : '';
-        const mrpLine = mrp > rate ? `<span class="cart-item-mrp">\u20B9${mrp}</span>` : '';
+
+        const teluguLine = product.nameTelugu
+            ? `<div class="cart-item-name-te">${escapeHtml(product.nameTelugu)}</div>`
+            : '';
+
+        const mrpLine = mrp > rate
+            ? `<span class="cart-item-mrp">₹${mrp}</span>`
+            : '';
+
         const unitBadge = `<span class="cart-item-unit-badge ${unitType}">${unitType.toUpperCase()}</span>`;
 
-return `
-<div class="cart-item">
+        return `
+            <div class="cart-item">
 
-  <div class="cart-item-left">
-    ${product.image 
-      ? `<img src="${escapeHtml(product.image)}" />` 
-      : `<span class="cart-emoji">${fallback}</span>`}
-  </div>
+                <div class="cart-item-left">
+                    ${imageHtml}
+                </div>
 
-  <div class="cart-item-center">
-    <div class="cart-name">${escapeHtml(product.name)}</div>
-    <div class="cart-unit">${unitLabel}</div>
+                <div class="cart-item-center">
+                    <div class="cart-name">
+                        ${escapeHtml(product.name)}
+                        ${unitBadge}
+                    </div>
 
-    <div class="cart-price">
-      ₹${rate} × ${qty}
-    </div>
-  </div>
+                    ${teluguLine}
 
-  <div class="cart-item-right">
-    <div class="cart-qty">
-      <button onclick="decrementItem('${product.id}', '${unitType}')">−</button>
-      <span>${qty}</span>
-      <button onclick="incrementItem('${product.id}', '${unitType}')">+</button>
-    </div>
+                    <div class="cart-unit">
+                        ${escapeHtml(product.brand)} • ${escapeHtml(product.packSize)} • ${unitLabel}
+                    </div>
 
-    <div class="cart-total">
-      ₹${amount}
-    </div>
-  </div>
+                    <div class="cart-price">
+                        Rate: ₹${rate}/${unitLabel.replace(/s$/, '')}
+                        ${mrpLine}
+                    </div>
 
-</div>
-`;
-</div>
-  <div class="cart-item-right">
-    <div class="cart-qty">
-      <button onclick="decrementItem('${p.id}', '${unit}')">−</button>
-      <span>${qty}</span>
-      <button onclick="incrementItem('${p.id}', '${unit}')">+</button>
-    </div>
+                    ${unitsInfo ? `<div class="cart-unit">${unitsInfo}</div>` : ''}
+                </div>
 
-    <div class="cart-total">
-      ₹${price * qty}
-    </div>
-  </div>
+                <div class="cart-item-right">
+                    <div class="cart-qty">
+                        <button onclick="decrementCartItem('${key}')">−</button>
+                        <span>${qty}</span>
+                        <button onclick="incrementCartItem('${key}')">+</button>
+                    </div>
 
-</div>
-`;
+                    <div class="cart-total">
+                        ₹${amount.toLocaleString('en-IN')}
+                    </div>
 
+                    <button class="cart-item-remove" onclick="removeCartItem('${key}')">
+                        Remove
+                    </button>
+                </div>
+
+            </div>
+        `;
     }).join('');
 
-    const savingsRow = totalSavings > 0 ? `<div class="cart-summary-row savings"><span>\uD83C\uDF89 You Save:</span><span>\u20B9${totalSavings.toLocaleString('en-IN')}</span></div>` : '';
-    const mrpRow = totalSavings > 0 ? `<div class="cart-summary-row"><span>Total MRP:</span><span style="text-decoration:line-through; color:#999;">\u20B9${totalMrp.toLocaleString('en-IN')}</span></div>` : '';
+    const savingsRow = totalSavings > 0
+        ? `
+            <div class="cart-summary-row savings">
+                <span>🎉 You Save:</span>
+                <span>₹${totalSavings.toLocaleString('en-IN')}</span>
+            </div>
+        `
+        : '';
+
+    const mrpRow = totalSavings > 0
+        ? `
+            <div class="cart-summary-row">
+                <span>Total MRP:</span>
+                <span style="text-decoration:line-through; color:#999;">
+                    ₹${totalMrp.toLocaleString('en-IN')}
+                </span>
+            </div>
+        `
+        : '';
+
     const breakdown = (totalCartonsCount > 0 && totalSinglesCount > 0)
-        ? `<div class="cart-summary-row"><span>Cartons / Pieces:</span><span><strong>${totalCartonsCount} cartons + ${totalSinglesCount} pcs</strong></span></div>`
+        ? `
+            <div class="cart-summary-row">
+                <span>Cartons / Pieces:</span>
+                <span><strong>${totalCartonsCount} cartons + ${totalSinglesCount} pcs</strong></span>
+            </div>
+        `
         : '';
 
     footer.innerHTML = `
         <div class="cart-summary">
-            <div class="cart-summary-row"><span>Total Items:</span><span><strong>${totalUnits}</strong></span></div>
+            <div class="cart-summary-row">
+                <span>Total Items:</span>
+                <span><strong>${totalUnits}</strong></span>
+            </div>
+
             ${breakdown}
             ${mrpRow}
             ${savingsRow}
-            <div class="cart-summary-row"><span>Sub Total:</span><span>\u20B9${grandTotal.toLocaleString('en-IN')}</span></div>
-            <div class="cart-summary-row total"><span>Grand Total:</span><span>\u20B9${grandTotal.toLocaleString('en-IN')}</span></div>
+
+            <div class="cart-summary-row">
+                <span>Sub Total:</span>
+                <span>₹${grandTotal.toLocaleString('en-IN')}</span>
+            </div>
+
+            <div class="cart-summary-row total">
+                <span>Grand Total:</span>
+                <span>₹${grandTotal.toLocaleString('en-IN')}</span>
+            </div>
         </div>
-        <button class="btn-checkout" onclick="proceedToCheckout()">Proceed to Checkout \u2192</button>
+
+        <button class="btn-checkout" onclick="proceedToCheckout()">
+            Proceed to Checkout →
+        </button>
     `;
 }
+
 
 /* ============ CHECKOUT ============ */
 function proceedToCheckout() {
