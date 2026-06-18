@@ -608,6 +608,8 @@ function updateCartUI() {
         bottomBar.classList.remove('hidden');
         document.getElementById('bcsCount').textContent = `${totalUnits} item${totalUnits!==1?'s':''}`;
         document.getElementById('bcsTotal').textContent = `\u20B9${grandTotal.toLocaleString('en-IN')}`;
+       const bcsAction = document.querySelector('.bcs-action');
+if (bcsAction) bcsAction.textContent = 'Place Order';
     } else {
         bottomBar.classList.add('hidden');
     }
