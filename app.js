@@ -426,8 +426,8 @@ const imageBlock = p.image
             <button class="heart-btn ${isFav ? 'active' : ''}" onclick="toggleWishlist('${p.id}')" aria-label="Wishlist">
                 ${isFav ? '♥' : '♡'}
             </button>
-
-            <div class="product-image">
+            
+<div class="product-image" ${p.image ? `onclick="openImageZoom('${p.image}')"` : ''}>
                 ${discountBadge}
                 ${imageBlock}
                 ${stockBadge}
