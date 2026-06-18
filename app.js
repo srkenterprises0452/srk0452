@@ -627,7 +627,7 @@ function updateCartUI() {
         document.getElementById('bcsCount').textContent = `${totalUnits} item${totalUnits!==1?'s':''}`;
         document.getElementById('bcsTotal').textContent = `\u20B9${grandTotal.toLocaleString('en-IN')}`;
        const bcsAction = document.querySelector('.bcs-action');
-if (bcsAction) bcsAction.textContent = 'Place Order';
+if (bcsAction) bcsAction.textContent = 'Order via WhatsApp';
     } else {
         bottomBar.classList.add('hidden');
     }
