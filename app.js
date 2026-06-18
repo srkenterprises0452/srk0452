@@ -884,44 +884,68 @@ function saveOrderToHistory(order) {
 
 function buildWhatsAppMessage(retailer) {
     const { lines, grandTotal, totalMrp, totalSavings, totalUnits, totalCartonsCount, totalSinglesCount } = getCartSummary();
-    const bar = '\u2501'.repeat(22);
-    let msg = '*SRK ENTERPRISES ORDER*\n';
-    msg += bar + '\n\n';
-    msg += `*Retailer:* ${retailer.shopName}\n`;
-    msg += `*Contact:* ${retailer.contactPerson}\n`;
-    msg += `*Mobile:* ${retailer.mobile}\n`;
-    msg += `*Area:* ${retailer.area}\n`;
-    msg += `*Town:* ${retailer.town}\n\n`;
-    msg += bar + '\n';
-    msg += '*ORDER DETAILS*\n';
-    msg += bar + '\n\n';
+
+    const bar = '━━━━━━━━━━━━━━━━━━━━';
+
+    let msg = `*🧾 SRK ENTERPRISES ORDER*\n${bar}\n\n`;
+
+    msg += `🏪 *Shop:* ${retailer.shopName}\n`;
+    msg += `👤 *Contact:* ${retailer.contactPerson}\n`;
+    msg += `📞 *Mobile:* ${retailer.mobile}\n`;
+    msg += `📍 *Area:* ${retailer.area}\n`;
+    msg += `🏙 *Town:* ${retailer.town}\n\n`;
+
+    msg += `${bar}\n📦 *ORDER DETAILS*\n${bar}\n\n`;
+
     lines.forEach((line, idx) => {
         const p = line.product;
         const ct = p.cartonType || 'Carton';
+
         msg += `${idx + 1}. *${p.name}* (${p.packSize})\n`;
-        if (p.nameTelugu) msg += `   ${p.nameTelugu}\n`;
-        if (line.unitType === 'carton') {
-            const totalUnits = line.qty * (p.unitsPerCarton || 1);
-            msg += `   Order: ${line.qty} ${ct}${line.qty>1?'s':''} (${totalUnits} ${p.unitsPerCarton ? 'units' : ''})\n`;
-            msg += `   Rate: \u20B9${line.rate}/${ct.toLowerCase()}\n`;
-        } else {
-            msg += `   Order: ${line.qty} pcs (single)\n`;
-            msg += `   Rate: \u20B9${line.rate}/pc\n`;
+
+        if (p.nameTelugu) {
+            msg += `   ${p.nameTelugu}\n`;
         }
-        msg += `   Amount: \u20B9${line.amount.toLocaleString('en-IN')}\n\n`;
+
+        if (line.unitType === 'carton') {
+            const totalUnitsCalc = line.qty * (p.unitsPerCarton || 1);
+
+            msg += `   👉 ${line.qty} ${ct.toLowerCase()}${line.qty > 1 ? 's' : ''} (${totalUnitsCalc} units)\n`;
+            msg += `   💸 ₹${line.rate} / ${ct.toLowerCase()}\n`;
+        } else {
+            msg += `   👉 ${line.qty} pcs\n`;
+            msg += `   💸 ₹${line.rate} / pc\n`;
+        }
+
+        msg += `   ✅ ₹${line.amount.toLocaleString('en-IN')}\n\n`;
     });
-    msg += bar + '\n';
-    if (totalCartonsCount > 0) msg += `*Cartons/Bags:* ${totalCartonsCount}\n`;
-    if (totalSinglesCount > 0) msg += `*Single Pieces:* ${totalSinglesCount}\n`;
-    msg += `*Total Items:* ${totalUnits}\n`;
+
+    msg += `${bar}\n📊 *SUMMARY*\n${bar}\n\n`;
+
+    if (totalCartonsCount > 0)
+        msg += `📦 Cartons: ${totalCartonsCount}\n`;
+
+    if (totalSinglesCount > 0)
+        msg += `🧾 Pieces: ${totalSinglesCount}\n`;
+
+    msg += `📦 Total Items: ${totalUnits}\n\n`;
+
     if (totalSavings > 0) {
-        msg += `*Total MRP:* \u20B9${totalMrp.toLocaleString('en-IN')}\n`;
-        msg += `*You Save:* \u20B9${totalSavings.toLocaleString('en-IN')} \uD83C\uDF89\n`;
+        msg += `💰 MRP Total: ₹${totalMrp.toLocaleString('en-IN')}\n`;
+        msg += `🎉 You Save: ₹${totalSavings.toLocaleString('en-IN')}\n\n`;
     }
-    msg += `*GRAND TOTAL: \u20B9${grandTotal.toLocaleString('en-IN')}*\n`;
-    msg += bar + '\n';
-    if (retailer.remarks) msg += `\n*Remarks:*\n${retailer.remarks}\n`;
-    msg += `\nOrder placed via SRK Enterprises Portal\nDate: ${new Date().toLocaleString('en-IN')}`;
+
+    msg += `💵 *GRAND TOTAL: ₹${grandTotal.toLocaleString('en-IN')}*\n`;
+    msg += `${bar}\n`;
+
+    if (retailer.remarks) {
+        msg += `\n📝 *Remarks:*\n${retailer.remarks}\n`;
+    }
+
+    msg += `\n📅 ${new Date().toLocaleString('en-IN')}\n`;
+    msg += `✅ Order placed via SRK Portal`;
+   msg += `*THANK YOU* for choosing SRK Enterprises as your buisiness partner`;
+
     return msg;
 }
 
