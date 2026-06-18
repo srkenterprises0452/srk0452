@@ -309,110 +309,157 @@ function getCurrentRate(p, qty, unitType) {
 function getMrp(p, unitType) {
     return unitType === 'carton' ? p.cartonMrp : p.singleMrp;
 }
-
 function renderProductCard(p) {
     const cartKey = (unit) => `${p.id}__${unit}`;
     const currentUnit = getProductUnit(p);
     const qty = state.cart[cartKey(currentUnit)] ? state.cart[cartKey(currentUnit)].qty : 0;
+    const displayQty = qty || 1;
+
     const inCart = qty > 0;
     const isOut = p.stockStatus === 'out';
     const isFav = !!state.wishlist[p.id];
 
-    const currentRate = getCurrentRate(p, qty || 1, currentUnit);
+    const currentRate = getCurrentRate(p, displayQty, currentUnit);
     const mrp = getMrp(p, currentUnit);
     const hasDiscount = mrp > currentRate;
     const discountPct = hasDiscount ? Math.round(((mrp - currentRate) / mrp) * 100) : 0;
 
-    const stockBadge = isOut
-        ? `<span class="stock-badge out">Out of Stock</span>`
-        : `<span class="stock-badge">In Stock</span>`;
-    const discountBadge = hasDiscount && !isOut
-        ? `<span class="discount-badge">${discountPct}% OFF</span>` : '';
+    const fallbackEmoji = p.emoji || '📦';
 
-    const fallbackEmoji = p.emoji || '\uD83D\uDCE6';
     const imageBlock = p.image
-        ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" /><div class="placeholder-emoji" style="display:none;">${fallbackEmoji}</div>`
-        : `<div class="placeholder-emoji">${fallbackEmoji}</div>`;
+        ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+           <span class="placeholder-emoji" style="display:none;">${fallbackEmoji}</span>`
+        : `<span class="placeholder-emoji">${fallbackEmoji}</span>`;
 
-    const teluguLine = p.nameTelugu ? `<div class="product-name-telugu">${escapeHtml(p.nameTelugu)}</div>` : '';
-    const descLine = p.description && currentUnit === 'carton' ? `<div class="product-desc">\uD83D\uDCE6 ${escapeHtml(p.description)}</div>` : '';
+    const stockBadge = isOut
+        ? `<span class="stock-badge out">Out</span>`
+        : `<span class="stock-badge">In Stock</span>`;
 
-    // Unit toggle (only if both allowed)
+    const discountBadge = hasDiscount && !isOut
+        ? `<span class="discount-badge">${discountPct}% OFF</span>`
+        : '';
+
+    const teluguLine = p.nameTelugu
+        ? `<div class="product-name-telugu">${escapeHtml(p.nameTelugu)}</div>`
+        : '';
+
+    const descLine = p.description && currentUnit === 'carton'
+        ? `<div class="product-desc">📦 ${escapeHtml(p.description)}</div>`
+        : '';
+
     let unitToggle = '';
     if (p.allowSingle && p.allowCarton) {
         unitToggle = `
             <div class="unit-toggle">
                 <button class="${currentUnit === 'single' ? 'active' : ''}" onclick="setProductUnit('${p.id}', 'single')">Single</button>
-                <button class="${currentUnit === 'carton' ? 'active' : ''}" onclick="setProductUnit('${p.id}', 'carton')">${p.cartonType || 'Carton'}</button>
-            </div>`;
+                <button class="${currentUnit === 'carton' ? 'active' : ''}" onclick="setProductUnit('${p.id}', 'carton')">${escapeHtml(p.cartonType || 'Carton')}</button>
+            </div>
+        `;
     }
 
-    // Price display
-    let priceDisplay = '';
-    if (currentUnit === 'single' && p.allowCarton) {
-        // Single flat
-        priceDisplay = `
-            <div class="price-display">
-                ${hasDiscount ? `<div class="mrp-line">MRP: <span class="mrp-value">\u20B9${mrp}</span></div>` : ''}
-                <div><span class="current-price">\u20B9${currentRate}</span> <span class="current-price-suffix">/${getUnitLabel(p, 'single')}</span></div>
-            </div>`;
-    } else if (currentUnit === 'single' && !p.allowCarton) {
-        // Single only - slabs
-        priceDisplay = `
-            <div class="price-display">
-                ${hasDiscount ? `<div class="mrp-line">MRP: <span class="mrp-value">\u20B9${mrp}</span></div>` : ''}
-                <div class="slab-row ${qty>=1 && qty<=4 ? 'active' : ''}"><span class="slab-label">1-4 pcs</span><span>\u20B9${p.singlePrice_1_4}</span></div>
-                <div class="slab-row ${qty>=5 && qty<=9 ? 'active' : ''}"><span class="slab-label">5-9 pcs</span><span>\u20B9${p.singlePrice_5_9}</span></div>
-                <div class="slab-row ${qty>=10 ? 'active' : ''}"><span class="slab-label">10+ pcs</span><span>\u20B9${p.singlePrice_10_plus}</span></div>
-            </div>`;
-    } else {
-        // Carton
+    let tierHint = '';
+    let tierTable = '';
+
+    if (currentUnit === 'carton') {
         const ct = p.cartonType || 'Carton';
-        priceDisplay = `
-            <div class="price-display">
-                ${hasDiscount ? `<div class="mrp-line">MRP: <span class="mrp-value">\u20B9${mrp}</span>/${ct.toLowerCase()}</div>` : ''}
-                <div class="slab-row ${qty>=1 && qty<=4 ? 'active' : ''}"><span class="slab-label">1-4 ${ct.toLowerCase()}s</span><span>\u20B9${p.cartonPrice_1_4}</span></div>
-                <div class="slab-row ${qty>=5 && qty<=9 ? 'active' : ''}"><span class="slab-label">5-9 ${ct.toLowerCase()}s</span><span>\u20B9${p.cartonPrice_5_9}</span></div>
-                <div class="slab-row ${qty>=10 ? 'active' : ''}"><span class="slab-label">10+ ${ct.toLowerCase()}s</span><span>\u20B9${p.cartonPrice_10_plus}</span></div>
-            </div>`;
+
+        tierHint = `<button class="tier-hint" onclick="toggleTierTable('${p.id}')">Buy 5+: ₹${p.cartonPrice_5_9}</button>`;
+
+        tierTable = `
+            <div class="tier-table" id="tier-${p.id}">
+                <div class="tier-table-row ${displayQty >= 1 && displayQty <= 4 ? 'active' : ''}">
+                    <span>1-4 ${ct.toLowerCase()}s</span>
+                    <strong>₹${p.cartonPrice_1_4}</strong>
+                </div>
+                <div class="tier-table-row ${displayQty >= 5 && displayQty <= 9 ? 'active' : ''}">
+                    <span>5-9 ${ct.toLowerCase()}s</span>
+                    <strong>₹${p.cartonPrice_5_9}</strong>
+                </div>
+                <div class="tier-table-row ${displayQty >= 10 ? 'active' : ''}">
+                    <span>10+ ${ct.toLowerCase()}s</span>
+                    <strong>₹${p.cartonPrice_10_plus}</strong>
+                </div>
+            </div>
+        `;
+    } else if (!p.allowCarton) {
+        tierHint = `<button class="tier-hint" onclick="toggleTierTable('${p.id}')">Buy 5+: ₹${p.singlePrice_5_9}</button>`;
+
+        tierTable = `
+            <div class="tier-table" id="tier-${p.id}">
+                <div class="tier-table-row ${displayQty >= 1 && displayQty <= 4 ? 'active' : ''}">
+                    <span>1-4 pcs</span>
+                    <strong>₹${p.singlePrice_1_4}</strong>
+                </div>
+                <div class="tier-table-row ${displayQty >= 5 && displayQty <= 9 ? 'active' : ''}">
+                    <span>5-9 pcs</span>
+                    <strong>₹${p.singlePrice_5_9}</strong>
+                </div>
+                <div class="tier-table-row ${displayQty >= 10 ? 'active' : ''}">
+                    <span>10+ pcs</span>
+                    <strong>₹${p.singlePrice_10_plus}</strong>
+                </div>
+            </div>
+        `;
     }
+
+    let priceDisplay = `
+        <div class="price-display">
+            ${hasDiscount ? `
+                <div class="mrp-line">MRP: <span class="mrp-value">₹${mrp}</span></div>
+            ` : ''}
+            <div class="current-price">
+                ₹${currentRate}
+                <span class="current-price-suffix">/${getUnitLabel(p, currentUnit).replace(/s$/, '')}</span>
+            </div>
+            ${tierHint}
+            ${tierTable}
+        </div>
+    `;
 
     const unitLabel = getUnitLabel(p, currentUnit);
 
     return `
-        <div class="product-card" data-id="${p.id}">
-            <button class="heart-btn ${isFav ? 'active' : ''}" onclick="toggleWishlist('${p.id}'); event.stopPropagation();">
-                ${isFav ? '\u2665' : '\u2661'}
+        <div class="product-card">
+            <button class="heart-btn ${isFav ? 'active' : ''}" onclick="toggleWishlist('${p.id}')" aria-label="Wishlist">
+                ${isFav ? '♥' : '♡'}
             </button>
+
             <div class="product-image">
                 ${discountBadge}
                 ${imageBlock}
                 ${stockBadge}
             </div>
+
             <div class="product-info">
                 <div class="product-name">${escapeHtml(p.name)}</div>
                 ${teluguLine}
+
                 <div class="product-brand">${escapeHtml(p.brand)}</div>
                 <div class="product-pack">${escapeHtml(p.packSize)}</div>
+
                 ${descLine}
                 ${unitToggle}
                 ${priceDisplay}
+
                 <div class="qty-add-row">
-                    <div class="qty-selector">
-                        <button class="qty-btn" onclick="decrementQtyInput('${p.id}')">\u2212</button>
-                        <input type="number" class="qty-input" id="qty-${p.id}" value="${qty || 1}" min="1" onchange="updateQtyInput('${p.id}', this.value)" />
-                        <span class="qty-unit-label">${unitLabel}</span>
-                        <button class="qty-btn" onclick="incrementQtyInput('${p.id}')">+</button>
+                    <div class="product-footer-row">
+                        <div class="qty-selector">
+                            <button class="qty-btn" onclick="decrementQtyInput('${p.id}')" ${isOut ? 'disabled' : ''}>−</button>
+                            <input class="qty-input" id="qty-${p.id}" value="${displayQty}" inputmode="numeric" onchange="updateQtyInput('${p.id}', this.value)" ${isOut ? 'disabled' : ''} />
+                            <button class="qty-btn" onclick="incrementQtyInput('${p.id}')" ${isOut ? 'disabled' : ''}>+</button>
+                        </div>
+
+                        <button class="btn-add ${inCart ? 'in-cart' : ''}" onclick="addToCart('${p.id}')" ${isOut ? 'disabled' : ''}>
+                            ${isOut ? 'Out of Stock' : inCart ? '✓ Added' : 'Add to Cart'}
+                        </button>
                     </div>
-                    <button class="btn-add ${inCart?'in-cart':''}" onclick="addToCart('${p.id}')" ${isOut?'disabled':''}>
-                        ${isOut ? 'Out of Stock' : inCart ? `In Cart (${qty})` : 'Add to Cart'}
-                    </button>
+
+                    <div class="qty-unit-label">${unitLabel}</div>
                 </div>
             </div>
         </div>
     `;
 }
-
 function getUnitLabel(p, unitType) {
     if (unitType === 'carton') {
         const ct = p.cartonType || 'Carton';
