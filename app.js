@@ -460,6 +460,21 @@ function renderProductCard(p) {
         </div>
     `;
 }
+function toggleTierTable(productId) {
+
+    // ✅ Close other open tables (clean UX)
+    document.querySelectorAll('.tier-table').forEach(el => {
+        if (el.id !== `tier-${productId}`) {
+            el.classList.remove('show');
+        }
+    });
+
+    // ✅ Toggle current one
+    const table = document.getElementById(`tier-${productId}`);
+    if (!table) return;
+
+    table.classList.toggle('show');
+}
 function getUnitLabel(p, unitType) {
     if (unitType === 'carton') {
         const ct = p.cartonType || 'Carton';
