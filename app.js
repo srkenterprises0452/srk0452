@@ -667,24 +667,36 @@ function renderCart() {
         const unitBadge = `<span class="cart-item-unit-badge ${unitType}">${unitType.toUpperCase()}</span>`;
 
         return `
-        <div class="cart-item">
-            <div class="cart-item-img">${imageHtml}</div>
-            <div class="cart-item-info">
-                <div class="cart-item-name">${escapeHtml(product.name)} ${unitBadge}</div>
-                ${teluguLine}
-                <div class="cart-item-meta">${escapeHtml(product.brand)} \u2022 ${escapeHtml(product.packSize)}</div>
-                <div class="cart-item-rate">Rate: \u20B9${rate}/${unitLabel.slice(0, -1)} ${mrpLine}</div>
-                <div class="cart-item-controls">
-                    <div class="cart-qty-selector">
-                        <button class="qty-btn" onclick="decrementCartItem('${key}')">\u2212</button>
-                        <input type="number" class="qty-input" value="${qty}" min="1" onchange="updateCartItemQty('${key}', this.value)" />
-                        <button class="qty-btn" onclick="incrementCartItem('${key}')">+</button>
-                    </div>
-                    <div class="cart-item-amount">\u20B9${amount.toLocaleString('en-IN')}${unitsInfo}</div>
-                </div>
-                <button class="cart-item-remove" onclick="removeCartItem('${key}')">Remove</button>
-            </div>
-        </div>`;
+<div class="cart-item">
+
+  <div class="cart-item-left">
+    ${p.image ? `<img src="${p.image}" />` : `<span class="cart-emoji">📦</span>`}
+  </div>
+
+  <div class="cart-item-center">
+    <div class="cart-name">${p.name}</div>
+    <div class="cart-unit">${unit}</div>
+
+    <div class="cart-price">
+      ₹${price} × ${qty}
+    </div>
+  </div>
+
+  <div class="cart-item-right">
+    <div class="cart-qty">
+      <button onclick="decrementItem('${p.id}', '${unit}')">−</button>
+      <span>${qty}</span>
+      <button onclick="incrementItem('${p.id}', '${unit}')">+</button>
+    </div>
+
+    <div class="cart-total">
+      ₹${price * qty}
+    </div>
+  </div>
+
+</div>
+`;
+
     }).join('');
 
     const savingsRow = totalSavings > 0 ? `<div class="cart-summary-row savings"><span>\uD83C\uDF89 You Save:</span><span>\u20B9${totalSavings.toLocaleString('en-IN')}</span></div>` : '';
