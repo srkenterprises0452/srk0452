@@ -117,25 +117,30 @@ a { color: inherit; text-decoration: none; }
 /* PRODUCT CARD */
 .product-card { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); display: flex; flex-direction: column; transition: var(--transition); animation: fadeInUp 0.3s ease; position: relative; }
 .product-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--border); }
+.product-card {
+  align-items: stretch;
+}
 .heart-btn { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 3; font-size: 15px; color: var(--text-muted); box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: var(--transition); }
 .heart-btn:hover { color: var(--danger); transform: scale(1.1); }
 .heart-btn.active { color: var(--danger); }
-
 .product-image {
   width: 112px;
-  min-height: 168px;
+  height: 140px;              /* ✅ FIXED HEIGHT (important) */
   background: #f9fafb;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   overflow: hidden;
-     border-right: 1px solid #f0f0f0
+  border-right: 1.5px solid #D1D5DB;
 }
 .product-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain; /* very important */
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
+
 .placeholder-emoji {
   font-size: 40px;
   display: flex;
