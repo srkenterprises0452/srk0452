@@ -631,3 +631,12 @@ body { overflow-x: hidden; }
   }
 }
 
+/* ✅ Tier table visibility control */
+.tier-table {
+  display: none;
+}
+
+.tier-table.show {
+  display: block;
+}
+
