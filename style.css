@@ -129,6 +129,7 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
   justify-content: center;
   overflow: hidden;
+     border-right: 1px solid #f0f0f0
 }
 .product-image img {
   width: 100%;
