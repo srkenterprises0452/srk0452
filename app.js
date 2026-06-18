@@ -942,9 +942,9 @@ function buildWhatsAppMessage(retailer) {
         msg += `\n📝 *Remarks:*\n${retailer.remarks}\n`;
     }
 
-    msg += `\n📅 ${new Date().toLocaleString('en-IN')}\n`;
-    msg += `✅ Order placed via SRK Portal`;
-   msg += `*THANK YOU* for choosing SRK Enterprises as your buisiness partner`;
+    msg += `\n ${new Date().toLocaleString('en-IN')}\n`;
+   
+   msg += `*THANK YOU* for choosing *SRK Enterprises* as your buisiness partner`;
 
     return msg;
 }
