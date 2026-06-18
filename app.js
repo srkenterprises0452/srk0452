@@ -666,34 +666,38 @@ function renderCart() {
         const mrpLine = mrp > rate ? `<span class="cart-item-mrp">\u20B9${mrp}</span>` : '';
         const unitBadge = `<span class="cart-item-unit-badge ${unitType}">${unitType.toUpperCase()}</span>`;
 
-        return `
+return `
 <div class="cart-item">
 
   <div class="cart-item-left">
-  ${product.image 
-    ? `<img src="${escapeHtml(product.image)}" />` 
-    : `<span class="cart-emoji">${fallback}</span>`}
+    ${product.image 
+      ? `<img src="${escapeHtml(product.image)}" />` 
+      : `<span class="cart-emoji">${fallback}</span>`}
+  </div>
+
+  <div class="cart-item-center">
+    <div class="cart-name">${escapeHtml(product.name)}</div>
+    <div class="cart-unit">${unitLabel}</div>
+
+    <div class="cart-price">
+      ₹${rate} × ${qty}
+    </div>
+  </div>
+
+  <div class="cart-item-right">
+    <div class="cart-qty">
+      <button onclick="decrementItem('${product.id}', '${unitType}')">−</button>
+      <span>${qty}</span>
+      <button onclick="incrementItem('${product.id}', '${unitType}')">+</button>
+    </div>
+
+    <div class="cart-total">
+      ₹${amount}
+    </div>
+  </div>
+
 </div>
-
-<div class="cart-item-center">
-  <div class="cart-name">${escapeHtml(product.name)}</div>
-  <div class="cart-unit">${unitLabel}</div>
-
-  <div class="cart-price">
-    ₹${rate} × ${qty}
-  </div>
-</div>
-
-<div class="cart-item-right">
-  <div class="cart-qty">
-    <button onclick="decrementItem('${product.id}', '${unitType}')">−</button>
-    <span>${qty}</span>
-    <button onclick="incrementItem('${product.id}', '${unitType}')">+</button>
-  </div>
-
-  <div class="cart-total">
-    ₹${amount}
-  </div>
+`;
 </div>
   <div class="cart-item-right">
     <div class="cart-qty">
