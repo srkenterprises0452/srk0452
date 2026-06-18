@@ -326,10 +326,13 @@ function renderProductCard(p) {
 
     const fallbackEmoji = p.emoji || '📦';
 
-    const imageBlock = p.image
-        ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-           <span class="placeholder-emoji" style="display:none;">${fallbackEmoji}</span>`
-        : `<span class="placeholder-emoji">${fallbackEmoji}</span>`;
+const imageBlock = p.image
+    ? `<img 
+          src="${escapeHtml(p.image)}" 
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+       />
+       <span class="placeholder-emoji" style="display:none;">${fallbackEmoji}</span>`
+    : `<span class="placeholder-emoji">${fallbackEmoji}</span>`;
 
     const stockBadge = isOut
         ? `<span class="stock-badge out">Out</span>`
