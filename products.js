@@ -62,11 +62,22 @@ async function loadProductsFromGoogleSheet() {
   try {
 
     // ✅ STEP 1: Fetch from sheet
-    if (GOOGLE_SHEET_API_URL) {
-      const res = await fetch(GOOGLE_SHEET_API_URL);
-      const data = await res.json();
-
       if (Array.isArray(data) && data.length > 0) {
+        async function loadProductsFromGoogleSheet(controller) {
+  const res = await fetch(GOOGLE_SHEET_API_URL, {
+    signal: controller?.signal
+  });
+
+  const data = await res.json();
+
+  return data.map(p => ({
+    ...p,
+    allowSingle: String(p.allowSingle).toLowerCase() === "true",
+    allowCarton: String(p.allowCarton).toLowerCase() === "true",
+    singleMrp: Number(p.singleMrp || 0),
+    singlePrice: Number(p.singlePrice || 0)
+  }));
+}
 
         // ✅ STEP 2: Normalize data (CRITICAL FIX)
         return data.map(p => ({
