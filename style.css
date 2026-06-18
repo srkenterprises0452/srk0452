@@ -331,3 +331,303 @@ body { overflow-x: hidden; }
   .cart-item-controls { gap: 8px; flex-wrap: wrap; }
   .bottom-cart-summary { left: 8px; right: 8px; max-width: none; }
 }
+
+/* ==========================================================
+   SRK MOBILE-FIRST UX UPGRADE
+   Single-column product cards + better header/filter/cart UX
+   ========================================================== */
+
+/* Header: Navy brand background */
+.header {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+  color: white;
+  border-bottom: none;
+}
+
+.header-title h1 {
+  color: white !important;
+}
+
+.header-title p {
+  color: #FED7AA !important;
+  font-weight: 700;
+  opacity: 1;
+}
+
+.header-logo {
+  background: white;
+  border-radius: 50%;
+  padding: 3px;
+}
+
+.search-wrap {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+}
+
+.search-box {
+  border: none;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+
+.my-cart-btn {
+  background: var(--secondary) !important;
+  box-shadow: 0 4px 14px rgba(249,115,22,0.45);
+}
+
+.cart-count-bubble {
+  background: var(--primary-dark);
+  border-color: white;
+}
+
+/* Filters */
+.filters-wrap {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-pill {
+  background: white;
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.filter-pill.active {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
+
+.filter-pill.active.brand-pill {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
+/* Product grid: mobile one column */
+.product-grid {
+  grid-template-columns: 1fr !important;
+  gap: 14px !important;
+}
+
+/* New horizontal card */
+.product-card {
+  display: grid !important;
+  grid-template-columns: 112px 1fr;
+  min-height: 168px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(15,31,92,0.08);
+  border: 1px solid var(--border-light);
+}
+
+/* Left image area */
+.product-image {
+  width: 112px;
+  height: 100%;
+  min-height: 168px;
+  aspect-ratio: auto !important;
+  border-radius: 0;
+}
+
+.product-image img {
+  object-fit: cover;
+}
+
+.product-image .placeholder-emoji {
+  font-size: 46px;
+}
+
+/* Badges */
+.discount-badge {
+  top: 6px;
+  left: 6px;
+  font-size: 9px;
+  padding: 3px 7px;
+  border-radius: 999px;
+}
+
+.stock-badge {
+  bottom: 6px;
+  left: 6px;
+  font-size: 9px;
+  padding: 3px 7px;
+  border-radius: 999px;
+}
+
+/* Right content */
+.product-info {
+  padding: 12px;
+  gap: 5px;
+}
+
+.product-name {
+  font-size: 15px;
+  min-height: auto;
+  -webkit-line-clamp: 2;
+}
+
+.product-name-telugu {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.product-brand,
+.product-pack {
+  font-size: 11px;
+}
+
+/* Price */
+.price-display {
+  padding: 9px 10px;
+  margin: 6px 0;
+  border-radius: 12px;
+}
+
+.price-display .current-price {
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.price-display .mrp-line {
+  font-size: 11px;
+}
+
+/* Tier hint */
+.tier-hint {
+  margin-top: 6px;
+  color: var(--secondary-dark);
+  background: #FFF7ED;
+  border: 1px solid #FED7AA;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 4px;
+}
+
+.tier-hint::after {
+  content: "›";
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Expandable tier table */
+.tier-table {
+  display: none;
+  margin-top: 8px;
+  background: white;
+  border: 1px solid #FED7AA;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.tier-table.show {
+  display: block;
+}
+
+.tier-table-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 9px;
+  font-size: 11px;
+  border-bottom: 1px solid #FEF3C7;
+}
+
+.tier-table-row:last-child {
+  border-bottom: none;
+}
+
+.tier-table-row.active {
+  background: #FFF7ED;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+/* Card footer controls */
+.qty-add-row {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.unit-toggle {
+  margin: 6px 0 0;
+}
+
+.product-footer-row {
+  display: grid;
+  grid-template-columns: 118px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.qty-selector {
+  min-height: 40px;
+}
+
+.qty-btn {
+  width: 34px;
+  height: 34px;
+}
+
+.qty-input {
+  width: 34px;
+}
+
+.btn-add {
+  min-height: 42px;
+  font-size: 13px;
+  background: var(--secondary);
+}
+
+.btn-add.in-cart {
+  background: var(--primary);
+}
+
+/* Sticky cart bar */
+.bottom-cart-summary {
+  background: var(--primary-dark);
+  border-radius: 18px;
+  padding: 12px 14px;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+}
+
+.bcs-total {
+  color: white;
+}
+
+.bcs-action {
+  background: var(--secondary);
+  color: white;
+  min-width: 118px;
+  text-align: center;
+}
+
+/* Tablet/Desktop keep multi column */
+@media (min-width: 700px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .product-card {
+    grid-template-columns: 130px 1fr;
+  }
+
+  .product-image {
+    width: 130px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
