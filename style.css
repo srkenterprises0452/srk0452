@@ -272,7 +272,7 @@ a { color: inherit; text-decoration: none; }
 @media (min-width: 600px) {
     .header-title h1 { font-size: 24px; }
     .header-title p { font-size: 13px; }
-    .product-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .product-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
     .banner-overlay h2 { font-size: 32px; }
     .features-strip { grid-template-columns: repeat(4, 1fr); }
     .footer-grid { grid-template-columns: 2fr 1fr 1fr; }
