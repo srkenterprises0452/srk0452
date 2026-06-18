@@ -379,7 +379,6 @@ function renderProductCard(p) {
                     <span>10+ ${ct.toLowerCase()}s</span>
                     <strong>₹${p.cartonPrice_10_plus}</strong>
                 </div>
-                <div class="tier-table" id="tier-${p.id}">
             </div>
         `;
     } else if (!p.allowCarton) {
