@@ -107,7 +107,7 @@ const PRODUCTS = [
         "cartonPrice_1_4": 1980,
         "cartonPrice_5_9": 1900,
         "cartonPrice_10_plus": 1820,
-        "description": "Carton contains 12 x 1L pouches",
+        "description": "Carton contains 4 x 5L pouches",
         "stockStatus": "in"
     },
     {
@@ -133,7 +133,7 @@ const PRODUCTS = [
         "cartonPrice_1_4": 1320,
         "cartonPrice_5_9": 1300,
         "cartonPrice_10_plus": 1280,
-        "description": "Bag contains 10 x 5kg packets",
+        "description": "Bag contains 6 x 5kg packets",
         "stockStatus": "in"
     },
     {
@@ -159,7 +159,7 @@ const PRODUCTS = [
         "cartonPrice_1_4": 1350,
         "cartonPrice_5_9": 1320,
         "cartonPrice_10_plus": 1290,
-        "description": "Bag contains 10 x 5kg packets",
+        "description": "Bag contains 30 x 5kg packets",
         "stockStatus": "in"
     },
     {
@@ -185,7 +185,7 @@ const PRODUCTS = [
         "cartonPrice_1_4": 375,
         "cartonPrice_5_9": 360,
         "cartonPrice_10_plus": 350,
-        "description": "Single 1kg packet",
+        "description": "Bag contains 25 x 1kg packets",
         "stockStatus": "in"
     },
     {
@@ -211,7 +211,7 @@ const PRODUCTS = [
         "cartonPrice_1_4": 300,
         "cartonPrice_5_9": 290,
         "cartonPrice_10_plus": 280,
-        "description": "Single 1kg packet",
+        "description": "Bag contains 25 x 1kg packets",
         "stockStatus": "in"
     },
     {
@@ -237,7 +237,7 @@ const PRODUCTS = [
         "cartonPrice_1_4": 2500,
         "cartonPrice_5_9": 2400,
         "cartonPrice_10_plus": 2300,
-        "description": "Bag contains 10 x 5kg packets",
+        "description": "Corton contains 20 x 1kg packets",
         "stockStatus": "in"
     },
     {
@@ -263,7 +263,7 @@ const PRODUCTS = [
         "cartonPrice_1_4": 1200,
         "cartonPrice_5_9": 1150,
         "cartonPrice_10_plus": 1100,
-        "description": "Bag contains 10 x 5kg packets",
+        "description": "Bag contains 25 x 1kg packets",
         "stockStatus": "in"
     },
     {
@@ -289,7 +289,7 @@ const PRODUCTS = [
         "cartonPrice_1_4": 8200,
         "cartonPrice_5_9": 7950,
         "cartonPrice_10_plus": 7700,
-        "description": "Carton contains 12 x 1L tins",
+        "description": "Carton contains 12 x 1L Jars",
         "stockStatus": "in"
     },
     {
