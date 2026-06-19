@@ -4,8 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <meta name="theme-color" content="#1E3A8A" />
-    <meta name="description" content="SRK Enterprises - B2B FMCG Wholesale Ordering Portal" />
-    <title>SRK Enterprises | B2B FMCG Ordering Portal</title>
+    <meta name="description" content="Order FMCG products wholesale from SRK Enterprises. Reliance Independence, Surya Masale and more. Serving Rajanna Sircilla and Siddipet districts." />
+
+    <!-- ✅ FIX 1: Updated page title with location keywords for local SEO -->
+    <title>SRK Enterprises – FMCG Wholesale Distributor | Rajanna Sircilla &amp; Siddipet</title>
+
+    <!-- ✅ FIX 2: Open Graph meta tags for WhatsApp / social link previews -->
+    <meta property="og:title" content="SRK Enterprises – B2B FMCG Ordering Portal" />
+    <meta property="og:description" content="Order wholesale FMCG products. Reliance Independence, Surya Masale. Rajanna Sircilla &amp; Siddipet." />
+    <meta property="og:image" content="https://srkenterprises.co/logo-circle.png" />
+    <meta property="og:url" content="https://srkenterprises.co" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SRK Enterprises" />
+
+    <!-- ✅ FIX 3: Canonical tag -->
+    <link rel="canonical" href="https://srkenterprises.co" />
+
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/png" href="logo-circle.png" />
     <link rel="apple-touch-icon" href="logo-circle.png" />
@@ -40,7 +54,13 @@
         </div>
         <div class="search-wrap">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search products, brands or categories..." oninput="handleSearch(event)" autocomplete="off" />
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search products, brands or categories..."
+                    oninput="handleSearch(event)"
+                    autocomplete="off"
+                />
                 <button class="search-btn" aria-label="Search">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                 </button>
@@ -74,11 +94,18 @@
             <div class="banner-dots" id="bannerDots"></div>
         </section>
 
-        <div class="section-header" id="productsSection">
+        <!-- ✅ FIX 4: Skeleton loader cards shown while products load -->
+        <div id="skeletonGrid" class="product-grid skeleton-grid">
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w60"></div><div class="sk-line w40"></div><div class="sk-line w80"></div><div class="sk-line w50"></div></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w60"></div><div class="sk-line w40"></div><div class="sk-line w80"></div><div class="sk-line w50"></div></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w60"></div><div class="sk-line w40"></div><div class="sk-line w80"></div><div class="sk-line w50"></div></div></div>
+        </div>
+
+        <div class="section-header hidden" id="productsSection">
             <h2 class="section-title">Our Products</h2>
             <span class="section-count" id="resultsInfo">Showing 36 products</span>
         </div>
-        <div class="product-grid" id="productGrid"></div>
+        <div class="product-grid hidden" id="productGrid"></div>
         <div id="emptyResults" class="empty-state hidden">
             <div class="empty-icon">&#128269;</div>
             <h3>No products found</h3>
@@ -87,28 +114,50 @@
     </main>
 
     <!-- ========== FEATURES STRIP ========== -->
+    <!-- ✅ FIX 5: Replaced emoji with SVG icons for consistent rendering across all Android versions -->
     <section class="features-strip">
-        <div class="feature"><span class="feature-icon">&#128666;</span><div><strong>Free Delivery</strong><small>On orders above &#8377;2,000</small></div></div>
-        <div class="feature"><span class="feature-icon">&#128176;</span><div><strong>Best Prices</strong><small>Competitive wholesale rates</small></div></div>
-        <div class="feature"><span class="feature-icon">&#9989;</span><div><strong>Quality Assured</strong><small>100% genuine products</small></div></div>
-        <div class="feature"><span class="feature-icon">&#128222;</span><div><strong>Quick Support</strong><small>+91 99480 00452</small></div></div>
+        <div class="feature">
+            <span class="feature-icon">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </span>
+            <div><strong>Free Delivery</strong><small>On orders above &#8377;2,000</small></div>
+        </div>
+        <div class="feature">
+            <span class="feature-icon">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83M16.62 12l-5.74 9.94"/></svg>
+            </span>
+            <div><strong>Best Prices</strong><small>Competitive wholesale rates</small></div>
+        </div>
+        <div class="feature">
+            <span class="feature-icon">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </span>
+            <div><strong>Quality Assured</strong><small>100% genuine products</small></div>
+        </div>
+        <div class="feature">
+            <span class="feature-icon">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.18 6.18l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>
+            </span>
+            <div><strong>Quick Support</strong><small>+91 99480 00452</small></div>
+        </div>
     </section>
 
     <!-- ========== BOTTOM CART (Mobile) ========== -->
-    <div id="bottomCartSummary" class="bottom-cart-summary hidden" onclick="openCart()">
-        <div class="bcs-info">
+    <!-- ✅ FIX 6: Starts hidden — shown only when cart has items (via JS) -->
+    <div id="bottomCartSummary" class="bottom-cart-summary hidden">
+        <div class="bcs-info" onclick="openCart()">
             <span class="bcs-count" id="bcsCount">0 items</span>
             <span class="bcs-total" id="bcsTotal">&#8377;0</span>
         </div>
-        <div class="bcs-action">View Cart &rarr;</div>
+        <div class="bcs-action" onclick="proceedToCheckoutDirect()">Order via WhatsApp &#8594;</div>
     </div>
 
     <!-- ========== CART MODAL ========== -->
     <div id="cartModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>&#128722; Your Cart</h2>
-                <button class="modal-close" onclick="closeCart()">&times;</button>
+                <h2>Your Cart</h2>
+                <button class="modal-close" onclick="closeCart()" aria-label="Close cart">&times;</button>
             </div>
             <div class="modal-body" id="cartBody"></div>
             <div class="modal-footer" id="cartFooter"></div>
@@ -119,20 +168,43 @@
     <div id="checkoutModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>&#128203; Retailer Details</h2>
-                <button class="modal-close" onclick="closeCheckout()">&times;</button>
+                <h2>Retailer Details</h2>
+                <button class="modal-close" onclick="closeCheckout()" aria-label="Close checkout">&times;</button>
             </div>
             <div class="modal-body">
+                <!-- ✅ FIX 7: Added inputmode, autocomplete attributes on all form fields -->
                 <form id="checkoutForm" onsubmit="submitOrder(event)" novalidate>
-                    <div class="form-group"><label>Shop Name <span class="req">*</span></label><input type="text" id="shopName" required placeholder="e.g. ABC Stores" /></div>
-                    <div class="form-group"><label>Contact Person <span class="req">*</span></label><input type="text" id="contactPerson" required placeholder="e.g. Ramesh Kumar" /></div>
-                    <div class="form-group"><label>Mobile Number <span class="req">*</span></label><input type="tel" id="mobile" required pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile" /></div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Area <span class="req">*</span></label><input type="text" id="area" required placeholder="e.g. Sircilla" /></div>
-                        <div class="form-group"><label>Town <span class="req">*</span></label><input type="text" id="town" required placeholder="e.g. Rajanna Sircilla" /></div>
+                    <div class="form-group">
+                        <label>Shop Name <span class="req">*</span></label>
+                        <input type="text" id="shopName" required placeholder="e.g. ABC Stores" autocomplete="organization" />
                     </div>
-                    <div class="form-group"><label>Remarks (Optional)</label><textarea id="remarks" rows="3" placeholder="e.g. Urgent delivery"></textarea></div>
-                    <button type="submit" class="btn-whatsapp">&#128172; Send Order via WhatsApp</button>
+                    <div class="form-group">
+                        <label>Contact Person <span class="req">*</span></label>
+                        <input type="text" id="contactPerson" required placeholder="e.g. Ramesh Kumar" autocomplete="name" />
+                    </div>
+                    <div class="form-group">
+                        <label>Mobile Number <span class="req">*</span></label>
+                        <!-- ✅ FIX 8: inputmode="numeric" gives numeric keyboard on mobile -->
+                        <input type="tel" id="mobile" required pattern="[6-9][0-9]{9}" maxlength="10" placeholder="10-digit mobile" inputmode="numeric" autocomplete="tel" />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Area <span class="req">*</span></label>
+                            <input type="text" id="area" required placeholder="e.g. Sircilla" autocomplete="address-level3" />
+                        </div>
+                        <div class="form-group">
+                            <label>Town <span class="req">*</span></label>
+                            <input type="text" id="town" required placeholder="e.g. Rajanna Sircilla" autocomplete="address-level2" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Remarks (Optional)</label>
+                        <textarea id="remarks" rows="3" placeholder="e.g. Urgent delivery"></textarea>
+                    </div>
+                    <button type="submit" class="btn-whatsapp">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                        Send Order via WhatsApp
+                    </button>
                 </form>
             </div>
         </div>
@@ -142,34 +214,45 @@
     <footer class="footer">
         <div class="footer-grid">
             <div class="footer-col">
-                <img src="logo-circle.png" alt="SRK" class="footer-logo-img" />
+                <img src="logo-circle.png" alt="SRK Enterprises Logo" class="footer-logo-img" />
                 <h3>SRK Enterprises</h3>
                 <p class="footer-tag">Connecting Markets, Creating Futures</p>
                 <p class="footer-desc">FMCG Channel Partner serving Rajanna Sircilla &amp; Siddipet regions.</p>
             </div>
             <div class="footer-col">
                 <h4>Contact Us</h4>
-                <p>&#128222; <a href="tel:+919948000452">+91 99480 00452</a></p>
-                <p>&#128172; <a href="https://wa.me/919948000452" target="_blank" rel="noopener">WhatsApp Us</a></p>
-                
+                <p>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="white" style="vertical-align:middle;margin-right:4px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.18 6.18l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>
+                    <a href="tel:+919948000452">+91 99480 00452</a>
+                </p>
+                <p>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="#25D366" style="vertical-align:middle;margin-right:4px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                    <a href="https://wa.me/919948000452" target="_blank" rel="noopener">WhatsApp Us</a>
+                </p>
             </div>
             <div class="footer-col">
                 <h4>Useful Links</h4>
-                <p>&rsaquo; <a href="#">About Us</a></p>
-                <p>&rsaquo; <a href="#">Terms &amp; Conditions</a></p>
-                <p>&rsaquo; <a href="#">Privacy Policy</a></p>
+                <!-- ✅ FIX 9: Dead links replaced with mailto fallback until pages exist -->
+                <p>&rsaquo; <a href="mailto:srkenterprises@gmail.com?subject=About SRK Enterprises">About Us</a></p>
+                <p>&rsaquo; <a href="mailto:srkenterprises@gmail.com?subject=Terms and Conditions">Terms &amp; Conditions</a></p>
+                <p>&rsaquo; <a href="mailto:srkenterprises@gmail.com?subject=Privacy Policy">Privacy Policy</a></p>
             </div>
         </div>
+        <!-- ✅ FIX 10: Copyright year now dynamic via JS -->
         <div class="footer-bottom"><p>&copy; <span id="footerYear"></span> SRK Enterprises. All Rights Reserved.</p></div>
     </footer>
 
-    <a class="float-whatsapp" href="https://wa.me/919948000452" target="_blank" rel="noopener" aria-label="WhatsApp">&#128172;</a>
+    <!-- ✅ FIX 11: Float WhatsApp button repositioned above sticky cart bar via CSS -->
+    <a class="float-whatsapp" href="https://wa.me/919948000452" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+    </a>
+
+    <!-- Image Zoom Modal -->
+    <div id="imageZoomModal" class="image-zoom-modal" onclick="closeImageZoom()">
+        <img id="zoomedImage" src="" alt="Product zoom" />
+    </div>
 
     <script src="products.js"></script>
     <script src="app.js"></script>
-    <!-- ✅ Image Zoom Modal -->
-<div id="imageZoomModal" class="image-zoom-modal" onclick="closeImageZoom()">
-  <img id="zoomedImage" src="" />
-</div>
 </body>
 </html>
