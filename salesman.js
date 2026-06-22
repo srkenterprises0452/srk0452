@@ -4,26 +4,14 @@
 */
 
 const CONFIG = {
-  businessWhatsAppNumber: "91XXXXXXXXXX", // Replace with SRK order receiving WhatsApp number, example: 919876543210
+  businessWhatsAppNumber: "919948000452", // Replace with SRK order receiving WhatsApp number, example: 919876543210
   googleAppsScriptUrl: "", // Optional: paste deployed Apps Script Web App URL here
   currencySymbol: "₹"
 };
 
 // 1) Location master. Extend this for your exact districts/mandals/villages.
-const locationMaster = {
-  "Rajanna Sircilla": {
-    "Sircilla": ["Sircilla Town", "Pedur", "Thangallapalli", "Chandurthi"],
-    "Vemulawada": ["Vemulawada Town", "Nampally", "Marripally"],
-    "Yellareddypet": ["Yellareddypet", "Venkatapur", "Narayanapur"],
-    "Mustabad": ["Mustabad", "Gambhiraopet"]
-  },
-  "Siddipet": {
-    "Siddipet Urban": ["Siddipet Town", "Ponnala", "Narsapur"],
-    "Siddipet Rural": ["Ibrahimpur", "Pullur", "Raghavapur"],
-    "Dubbak": ["Dubbak", "Habshipur", "Lachapet"],
-    "Gajwel": ["Gajwel", "Pragnapur"]
-  }
-};
+const locationMaster = window.SRK_LOCATION_MASTER || {};
+
 
 // 2) Initial shop master. Google Sheet/localStorage can add more shops later.
 const defaultShops = [
