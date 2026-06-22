@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SRK Salesman Order Form</title>
+  <link rel="stylesheet" href="salesman.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <h1>SRK Enterprises</h1>
+      <p>Salesman Order Taking</p>
+    </div>
+    <button id="syncBtn" class="ghost-btn" type="button">Sync</button>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Salesman Details</h2>
+      <div class="grid two">
+        <label>
+          Salesman Name
+          <input id="salesmanName" type="text" placeholder="Enter salesman name" autocomplete="name" />
+        </label>
+        <label>
+          Salesman Mobile
+          <input id="salesmanMobile" type="tel" placeholder="Optional" />
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Location & Shop</h2>
+      <div class="grid three">
+        <label>
+          District
+          <select id="districtSelect"></select>
+        </label>
+        <label>
+          Mandal
+          <select id="mandalSelect"></select>
+        </label>
+        <label>
+          Village
+          <select id="villageSelect"></select>
+        </label>
+      </div>
+
+      <div class="grid two shop-row">
+        <label>
+          Select Shop
+          <input id="shopSearch" list="shopList" placeholder="Search / select shop" />
+          <datalist id="shopList"></datalist>
+        </label>
+        <div class="shop-actions">
+          <button id="addShopToggleBtn" type="button" class="secondary-btn">+ Add New Shop</button>
+        </div>
+      </div>
+
+      <div id="selectedShopBox" class="info-box hidden"></div>
+
+      <div id="newShopPanel" class="new-shop hidden">
+        <h3>Onboard New Shop</h3>
+        <div class="grid two">
+          <label>
+            Shop Name <span class="req">*</span>
+            <input id="newShopName" type="text" placeholder="Example: Ramesh Kirana" />
+          </label>
+          <label>
+            Mobile Number <span class="req">*</span>
+            <input id="newShopMobile" type="tel" placeholder="10 digit mobile" />
+          </label>
+          <label>
+            Owner Name
+            <input id="newOwnerName" type="text" placeholder="Optional" />
+          </label>
+          <label>
+            Address / Landmark
+            <input id="newShopAddress" type="text" placeholder="Optional" />
+          </label>
+        </div>
+        <button id="saveShopBtn" type="button" class="primary-btn">Save Shop</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <h2>Products</h2>
+        <input id="productSearch" type="search" placeholder="Search product" />
+      </div>
+      <div class="grid two filters">
+        <label>
+          Brand
+          <select id="brandFilter"></select>
+        </label>
+        <label>
+          Category
+          <select id="categoryFilter"></select>
+        </label>
+      </div>
+      <div id="productList" class="product-list"></div>
+    </section>
+
+    <section class="card sticky-cart">
+      <div class="section-head">
+        <h2>Order Cart</h2>
+        <button id="clearCartBtn" type="button" class="ghost-btn">Clear</button>
+      </div>
+      <div id="cartList" class="cart-list empty">No products added yet.</div>
+      <div class="totals">
+        <div><span>Items</span><strong id="cartItemsCount">0</strong></div>
+        <div><span>Grand Total</span><strong id="grandTotal">₹0</strong></div>
+      </div>
+      <div class="submit-row">
+        <button id="submitWhatsAppBtn" type="button" class="primary-btn">Submit via WhatsApp</button>
+        <button id="submitSheetBtn" type="button" class="secondary-btn">Save to Sheet</button>
+      </div>
+      <p id="statusText" class="status"></p>
+    </section>
+  </main>
+
+  <!-- Optional: If your current portal already has products.js, keep this line and ensure products.js exposes window.products or window.PRODUCTS -->
+  <script src="products.js"></script>
+  <script src="salesman.js"></script>
+</body>
+</html>
