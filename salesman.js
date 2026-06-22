@@ -241,13 +241,22 @@ function renderProducts() {
       <div class="product-title">${escapeHtml(p.name)} ${p.teluguName ? `<span>(${escapeHtml(p.teluguName)})</span>` : ""}</div>
       <div class="product-meta"><span>${escapeHtml(p.brand)}</span><span>${escapeHtml(p.category)}</span></div>
       <div class="price-row">
-        <span class="price-tag">MRP ${money(p.mrp)}</span>
-        <span class="price-tag">PCS ${money(p.price)}</span>
-        ${p.cartonEnabled ? `<span class="price-tag">Carton ${money(p.cartonPrice)}</span>` : ""}
+<span class="price-tag">MRP ${money(p.mrp)}</span>
+
+${p.allowSingle ? `<span class="price-tag">PCS ${money(p.price)}</span>` : ""}
+
+${p.cartonEnabled ? `<span class="price-tag">${p.cartonType || "Carton"} ${money(p.cartonPrice)}</span>` : ""}
       </div>
       <div class="qty-row">
-        <label>PCS<input id="pcs-${p.id}" type="number" min="0" value="0"></label>
-        <label>Cartons<input id="ctn-${p.id}" type="number" min="0" value="0" ${p.cartonEnabled ? "" : "disabled"}></label>
+<label>
+  PCS
+  <input id="pcs-${p.id}" type="number" min="0" value="0" ${p.allowSingle ? "" : "disabled"}>
+</label>
+
+<label>
+  ${p.cartonType || "Cartons"}
+  <input id="ctn-${p.id}" type="number" min="0" value="0" ${p.cartonEnabled ? "" : "disabled"}>
+</label>
         <button type="button" onclick="addToCart('${escapeJs(p.id)}')">Add</button>
       </div>
     </article>
