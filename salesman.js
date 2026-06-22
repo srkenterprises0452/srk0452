@@ -55,17 +55,61 @@ function init() {
 }
 
 function normalizeProducts(items) {
-  return items.map((p, index) => ({
-    id: p.id || p.sku || `P-${index + 1}`,
-    name: p.name || p.productName || "Unnamed Product",
-    teluguName: p.teluguName || p.telugu || "",
-    brand: p.brand || "General",
-    category: p.category || "General",
-    mrp: Number(p.mrp || p.MRP || 0),
-    price: Number(p.price || p.sellingPrice || p.rate || 0),
-    cartonPrice: Number(p.cartonPrice || p.casePrice || 0),
-    cartonEnabled: Boolean(p.cartonEnabled ?? p.cartonPrice ?? false)
-  }));
+  return items.map((p, index) => {
+    const singleMrp = Number(p.singleMrp || p.mrp || p.MRP || 0);
+
+    const singlePrice = Number(
+      p.singlePrice ||
+      p.singlePrice_1_4 ||
+      p.price ||
+      p.sellingPrice ||
+      p.rate ||
+      0
+    );
+
+    const cartonPrice = Number(
+      p.cartonPrice ||
+      p.cartonPrice_1_4 ||
+      p.casePrice ||
+      0
+    );
+
+    return {
+      id: p.id || p.sku || `P-${index + 1}`,
+
+      name: p.name || p.productName || "Unnamed Product",
+
+      teluguName: p.nameTelugu || p.teluguName || p.telugu || "",
+
+      brand: p.brand || "General",
+
+      category: p.category || "General",
+
+      mrp: singleMrp,
+
+      price: singlePrice,
+
+      cartonPrice: cartonPrice,
+
+      cartonEnabled: Boolean(p.allowCarton || p.cartonEnabled || cartonPrice > 0),
+
+      allowSingle: Boolean(p.allowSingle),
+
+      allowCarton: Boolean(p.allowCarton),
+
+      packSize: p.packSize || "",
+
+      unitsPerCarton: Number(p.unitsPerCarton || 0),
+
+      cartonType: p.cartonType || "Carton",
+
+      image: p.image || "",
+
+      stockStatus: p.stockStatus || "in",
+
+      original: p
+    };
+  });
 }
 
 function bindEvents() {
