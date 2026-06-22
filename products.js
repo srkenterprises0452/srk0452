@@ -475,6 +475,10 @@ const DEFAULT_BANNERS = [
     }
 ];
 
+window.products = products;
+``
+
+
 const GOOGLE_SHEET_API_URL = '';
 
 async function loadProductsFromGoogleSheet() {
