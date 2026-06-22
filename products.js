@@ -449,6 +449,7 @@ const PRODUCTS = [
         "stockStatus": "in"
     }
 ];
+window.products = PRODUCTS;
 
 const DEFAULT_BANNERS = [
     {
@@ -474,10 +475,6 @@ const DEFAULT_BANNERS = [
         "useOverlay": true
     }
 ];
-
-window.products = products;
-``
-
 
 const GOOGLE_SHEET_API_URL = '';
 
