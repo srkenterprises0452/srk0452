@@ -25,7 +25,6 @@ const CONFIG = {
     ORDERS_KEY: 'srk_orders_history',
     PRODUCT_UNIT_KEY: 'srk_product_unit_v1',
     BANNER_AUTO_MS: 5000,
-    SHOP_SHEET_API_URL: 'https://script.google.com/macros/s/AKfycbyz5XHDYmcx2175Zi46hwOl1Nz1DGTMkyWb58NWcADLW07qP2pOJam0aTuWs_V2r-3X/exec'
 };
 const SHOP_BACKEND = "firebase";
 let shopMasterSynced = false;
