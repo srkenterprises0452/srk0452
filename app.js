@@ -602,7 +602,15 @@ function addToCart(productId) {
     const unitType = getProductUnit(product);
     const qty = getQtyFromInput(productId);
     const key = `${productId}__${unitType}`;
-    state.cart[key] = { productId, unitType, qty };
+  state.cart[key] = {
+    productId,
+    unitType,
+    qty,
+    name: product.name,
+    brand: product.brand,
+    packSize: product.packSize
+};
+
     saveCartToStorage();
     renderProducts();
     updateCartUI();
