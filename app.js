@@ -14,18 +14,19 @@
 */
 'use strict';
 
-// ✅ Dual-mode support: normal retailer mode = index.html, salesman mode = index.html?mode=salesman
-const urlParams = new URLSearchParams(window.location.search);
-const isSalesmanMode = urlParams.get('mode') === 'salesman';
-
 const CONFIG = {
     WHATSAPP_NUMBER: '919948000452',
     CART_KEY: 'srk_cart_v2',
     WISHLIST_KEY: 'srk_wishlist_v1',
     ORDERS_KEY: 'srk_orders_history',
     PRODUCT_UNIT_KEY: 'srk_product_unit_v1',
-    BANNER_AUTO_MS: 5000
+    BANNER_AUTO_MS: 5000,
+    // ✅ Paste your deployed Google Apps Script Web App URL here. Leave blank to use local-only shop cache.
+    SHOP_SHEET_API_URL: 'https://script.google.com/macros/s/AKfycbyz5XHDYmcx2175Zi46hwOl1Nz1DGTMkyWb58NWcADLW07qP2pOJam0aTuWs_V2r-3X/exec'
 };
+
+// ✅ Shop master cache for salesman mode
+const SHOP_CACHE_KEY = 'srk_shop_master_cache_v1';
 
 const state = {
     products: [],
@@ -52,15 +53,6 @@ document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
     showLoader(true);
-
-    // ✅ Salesman mode UI: show location/shop block and hide banner to keep order-taking focused
-    if (isSalesmanMode) {
-        const block = document.getElementById('salesmanBlock');
-        if (block) block.style.display = 'block';
-
-        const banner = document.getElementById('bannerCarousel');
-        if (banner) banner.style.display = 'none';
-    }
 
     // ✅ FIX 1: Wrapped with .catch() — if Google Sheet fails, falls back to PRODUCTS
     state.products = await loadProductsFromGoogleSheet().catch(() => {
@@ -732,7 +724,6 @@ function updateCartUI() {
 function openCart() {
     renderCart();
     const modal = document.getElementById('cartModal');
-    prefillCheckoutFromSalesmanBlock();
     if (modal) { modal.classList.add('show'); document.body.style.overflow = 'hidden'; }
 }
 
@@ -827,54 +818,229 @@ function renderCart() {
 
 
 /* ============================================================
-   SALESMAN MODE HELPERS
+   GOOGLE SHEET SHOP MASTER - SALESMAN MODE
    ============================================================ */
-function getSalesmanContext() {
-    if (!isSalesmanMode) return null;
+let shopMaster = [];
 
+function setSalesmanShopStatus(message, type = 'info') {
+    const el = document.getElementById('salesmanShopStatus');
+    if (!el) return;
+    el.textContent = message || '';
+    el.style.color = type === 'error' ? '#b91c1c' : (type === 'success' ? '#0f766e' : '#64748b');
+}
+
+function getLocalShopMaster() {
+    try {
+        const raw = localStorage.getItem(SHOP_CACHE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveLocalShopMaster(shops) {
+    try {
+        localStorage.setItem(SHOP_CACHE_KEY, JSON.stringify(Array.isArray(shops) ? shops : []));
+    } catch (e) {}
+}
+
+function normalizeShop(s) {
     return {
-        shop: (document.getElementById('shop')?.value || '').trim(),
-        contactPerson: (document.getElementById('salesContactPerson')?.value || '').trim(),
-        mobile: (document.getElementById('salesMobile')?.value || '').trim(),
-        district: (document.getElementById('district')?.value || '').trim(),
-        mandal: (document.getElementById('mandal')?.value || '').trim(),
-        village: (document.getElementById('village')?.value || '').trim()
+        shopId: s.shopId || s.id || `SHOP-${Date.now()}-${Math.floor(Math.random() * 9999)}`,
+        shopName: (s.shopName || s.name || '').trim(),
+        contactPerson: (s.contactPerson || s.ownerName || '').trim(),
+        mobile: String(s.mobile || '').trim(),
+        district: (s.district || '').trim(),
+        mandal: (s.mandal || s.mondal || '').trim(),
+        village: (s.village || '').trim(),
+        address: (s.address || '').trim(),
+        createdAt: s.createdAt || new Date().toISOString(),
+        updatedAt: s.updatedAt || new Date().toISOString()
     };
 }
 
-function prefillCheckoutFromSalesmanBlock() {
-    const ctx = getSalesmanContext();
-    if (!ctx) return;
+function getSelectedShopFromInput() {
+    const name = (document.getElementById('shop')?.value || '').trim().toLowerCase();
+    const district = (document.getElementById('district')?.value || '').trim();
+    const mandal = (document.getElementById('mandal')?.value || '').trim();
+    const village = (document.getElementById('village')?.value || '').trim();
+    if (!name) return null;
 
-    const shopName = document.getElementById('shopName');
-    const contactPerson = document.getElementById('contactPerson');
-    const mobile = document.getElementById('mobile');
-    const area = document.getElementById('area');
-    const town = document.getElementById('town');
-
-    if (shopName && ctx.shop) shopName.value = ctx.shop;
-    if (contactPerson && ctx.contactPerson) contactPerson.value = ctx.contactPerson;
-    if (mobile && ctx.mobile) mobile.value = ctx.mobile;
-    if (area && ctx.village) area.value = ctx.village;
-    if (town && ctx.district) town.value = ctx.district;
+    return shopMaster.find(s =>
+        s.shopName.toLowerCase() === name &&
+        s.district === district &&
+        s.mandal === mandal &&
+        s.village === village
+    ) || null;
 }
 
-function appendSalesmanContextToMessage(msg) {
-    const ctx = getSalesmanContext();
-    if (!ctx) return msg;
+function autofillShopDetails() {
+    const shop = getSelectedShopFromInput();
+    if (!shop) return;
 
-    const hasAny = ctx.shop || ctx.contactPerson || ctx.mobile || ctx.district || ctx.mandal || ctx.village;
-    if (!hasAny) return msg;
+    const contact = document.getElementById('salesContactPerson');
+    const mobile = document.getElementById('salesMobile');
+    if (contact && shop.contactPerson) contact.value = shop.contactPerson;
+    if (mobile && shop.mobile) mobile.value = shop.mobile;
+    setSalesmanShopStatus(`Selected: ${shop.shopName}${shop.mobile ? ' | ' + shop.mobile : ''}`, 'success');
+}
 
-    msg += `\n\n━━━━━━━━━━━━━━━━━━━━\n🧑‍💼 *SALESMAN / ROUTE DETAILS*\n━━━━━━━━━━━━━━━━━━━━\n`;
-    if (ctx.shop) msg += `🏪 *Selected Shop:* ${ctx.shop}\n`;
-    if (ctx.contactPerson) msg += `👤 *Contact Person:* ${ctx.contactPerson}\n`;
-    if (ctx.mobile) msg += `📞 *Mobile:* ${ctx.mobile}\n`;
-    if (ctx.village) msg += `📍 *Village:* ${ctx.village}\n`;
-    if (ctx.mandal) msg += `📍 *Mandal:* ${ctx.mandal}\n`;
-    if (ctx.district) msg += `📍 *District:* ${ctx.district}\n`;
+function loadShopsByLocation() {
+    if (!isSalesmanMode) return;
 
-    return msg;
+    const district = (document.getElementById('district')?.value || '').trim();
+    const mandal = (document.getElementById('mandal')?.value || '').trim();
+    const village = (document.getElementById('village')?.value || '').trim();
+    const list = document.getElementById('shopList');
+    const shopInput = document.getElementById('shop');
+
+    if (!list) return;
+    list.innerHTML = '';
+    if (shopInput) shopInput.value = '';
+
+    if (!district || !mandal || !village) {
+        setSalesmanShopStatus('Select district, mandal and village to load shops.');
+        return;
+    }
+
+    const filtered = shopMaster
+        .filter(s => s.district === district && s.mandal === mandal && s.village === village)
+        .sort((a, b) => a.shopName.localeCompare(b.shopName));
+
+    filtered.forEach(s => {
+        const option = document.createElement('option');
+        option.value = s.shopName;
+        option.label = [s.mobile, s.contactPerson].filter(Boolean).join(' | ');
+        list.appendChild(option);
+    });
+
+    setSalesmanShopStatus(filtered.length ? `${filtered.length} shop(s) loaded for selected village.` : 'No shops found for this village. Type shop details and click + Add New Shop.');
+}
+
+// Used by location-dropdown-integration.js when district/mandal/village changes
+function loadShops() {
+    loadShopsByLocation();
+}
+
+async function syncShopsFromGoogleSheet(force = false) {
+    if (!isSalesmanMode) return;
+
+    const url = CONFIG.SHOP_SHEET_API_URL;
+    if (!url) {
+        shopMaster = getLocalShopMaster();
+        loadShopsByLocation();
+        setSalesmanShopStatus('Google Sheet URL not configured. Using local shop cache only.');
+        return;
+    }
+
+    try {
+        setSalesmanShopStatus('Syncing shops from Google Sheet...');
+        const response = await fetch(`${url}?action=getShops&ts=${Date.now()}`);
+        const data = await response.json();
+        const shops = Array.isArray(data.shops) ? data.shops.map(normalizeShop).filter(s => s.shopName) : [];
+        shopMaster = shops;
+        saveLocalShopMaster(shopMaster);
+        loadShopsByLocation();
+        setSalesmanShopStatus(`Shop master synced. ${shopMaster.length} shop(s) available.`, 'success');
+    } catch (e) {
+        shopMaster = getLocalShopMaster();
+        loadShopsByLocation();
+        setSalesmanShopStatus('Google Sheet sync failed. Loaded local shop cache.', 'error');
+    }
+}
+
+async function postShopToGoogleSheet(shop) {
+    const url = CONFIG.SHOP_SHEET_API_URL;
+    if (!url) return false;
+
+    try {
+        await fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'addShop', shop })
+        });
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+async function addNewShopFromSalesmanBlock() {
+    if (!isSalesmanMode) return;
+
+    const district = (document.getElementById('district')?.value || '').trim();
+    const mandal = (document.getElementById('mandal')?.value || '').trim();
+    const village = (document.getElementById('village')?.value || '').trim();
+    const shopName = (document.getElementById('shop')?.value || '').trim();
+    const contactPerson = (document.getElementById('salesContactPerson')?.value || '').trim();
+    const mobile = (document.getElementById('salesMobile')?.value || '').trim();
+
+    if (!district || !mandal || !village) {
+        showToast('Please select district, mandal and village', 'error');
+        return;
+    }
+    if (!shopName) {
+        showToast('Please enter shop name', 'error');
+        return;
+    }
+    if (mobile && !/^[6-9]\d{9}$/.test(mobile)) {
+        showToast('Please enter valid 10-digit mobile number', 'error');
+        return;
+    }
+
+    const duplicate = shopMaster.some(s =>
+        s.shopName.toLowerCase() === shopName.toLowerCase() &&
+        s.district === district &&
+        s.mandal === mandal &&
+        s.village === village
+    );
+
+    if (duplicate) {
+        showToast('Shop already exists for this village', 'info');
+        autofillShopDetails();
+        return;
+    }
+
+    const shop = normalizeShop({
+        shopId: `SHOP-${Date.now()}`,
+        shopName,
+        contactPerson,
+        mobile,
+        district,
+        mandal,
+        village,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    });
+
+    shopMaster.push(shop);
+    saveLocalShopMaster(shopMaster);
+    loadShopsByLocation();
+    const shopInput = document.getElementById('shop');
+    if (shopInput) shopInput.value = shop.shopName;
+
+    const posted = await postShopToGoogleSheet(shop);
+    showToast(posted ? 'Shop added and sent to Google Sheet' : 'Shop added locally. Google Sheet not configured/failed.', posted ? 'success' : 'info');
+    setSalesmanShopStatus(posted ? 'Shop added to Google Sheet. Use Sync Shops on other devices.' : 'Shop available locally. Configure Google Sheet URL for team sync.', posted ? 'success' : 'info');
+}
+
+function setupSalesmanShopMode() {
+    if (!isSalesmanMode) return;
+
+    shopMaster = getLocalShopMaster();
+
+    document.getElementById('addNewShopBtn')?.addEventListener('click', addNewShopFromSalesmanBlock);
+    document.getElementById('syncShopsBtn')?.addEventListener('click', () => syncShopsFromGoogleSheet(true));
+    document.getElementById('shop')?.addEventListener('change', autofillShopDetails);
+    document.getElementById('shop')?.addEventListener('blur', autofillShopDetails);
+
+    ['district', 'mandal', 'village'].forEach(id => {
+        document.getElementById(id)?.addEventListener('change', loadShopsByLocation);
+    });
+
+    syncShopsFromGoogleSheet();
 }
 
 /* ============================================================
@@ -893,7 +1059,6 @@ function proceedToCheckoutDirect() {
     const { totalUnits } = getCartSummary();
     if (totalUnits === 0) { showToast('Your cart is empty', 'error'); return; }
     const modal = document.getElementById('checkoutModal');
-    prefillCheckoutFromSalesmanBlock();
     if (modal) { modal.classList.add('show'); document.body.style.overflow = 'hidden'; }
 }
 
@@ -1033,8 +1198,6 @@ function buildWhatsAppMessage(retailer) {
     msg += `\n${new Date().toLocaleString('en-IN')}\n`;
     // ✅ FIX 7: Fixed "buisiness" typo → "business"
     msg += `*THANK YOU* for choosing *SRK Enterprises* as your business partner`;
-
-    msg = appendSalesmanContextToMessage(msg);
 
     return msg;
 }
