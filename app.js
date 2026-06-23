@@ -1091,7 +1091,7 @@ async function onVillageChanged() {
         renderShopOptions();
         return;
     }
-    await syncShopsFromGoogleSheet({ silent: true });
+    await syncShopsFromFirebase({ silent: true });
 }
 
 function prefillCheckoutFromSalesmanBlock() {
