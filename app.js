@@ -56,7 +56,14 @@ document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
     showLoader(true);
+if (isSalesmanMode) {
+    const block = document.getElementById("salesmanBlock");
+    if (block) block.style.display = "block";
 
+    const banner = document.getElementById("bannerCarousel");
+    if (banner) banner.style.display = "none";
+}
+   
     // ✅ FIX 1: Wrapped with .catch() — if Google Sheet fails, falls back to PRODUCTS
     state.products = await loadProductsFromGoogleSheet().catch(() => {
         console.warn('SRK: Product load failed, using local fallback');
