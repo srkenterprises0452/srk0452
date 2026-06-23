@@ -76,6 +76,18 @@ if (isSalesmanMode) {
         syncBtn.onclick = loadShopsFromSheet;
     }
 }
+   
+if (isSalesmanMode) {
+
+    const district = document.getElementById("district");
+    const mandal = document.getElementById("mandal");
+    const village = document.getElementById("village");
+
+    if (district) district.onchange = loadShopsFromSheet;
+    if (mandal) mandal.onchange = loadShopsFromSheet;
+    if (village) village.onchange = loadShopsFromSheet;
+}
+
 }
    
     // ✅ FIX 1: Wrapped with .catch() — if Google Sheet fails, falls back to PRODUCTS
