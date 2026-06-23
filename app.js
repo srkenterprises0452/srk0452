@@ -62,6 +62,20 @@ if (isSalesmanMode) {
 
     const banner = document.getElementById("bannerCarousel");
     if (banner) banner.style.display = "none";
+   if (isSalesmanMode) {
+
+    // ✅ Add Shop Button
+    const addBtn = document.getElementById("addNewShopBtn");
+    if (addBtn) {
+        addBtn.onclick = addNewShop;
+    }
+
+    // ✅ Sync Button
+    const syncBtn = document.getElementById("syncShopsBtn");
+    if (syncBtn) {
+        syncBtn.onclick = loadShopsFromSheet;
+    }
+}
 }
    
     // ✅ FIX 1: Wrapped with .catch() — if Google Sheet fails, falls back to PRODUCTS
