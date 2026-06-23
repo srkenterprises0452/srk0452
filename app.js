@@ -13,9 +13,10 @@
    11. Cart cleared after successful order submission
 */
 'use strict';
-// ✅ SALESMAN MODE DETECTION
+
+// Dual mode: retailer = index.html, salesman = index.html?mode=salesman
 const urlParams = new URLSearchParams(window.location.search);
-const isSalesmanMode = urlParams.get("mode") === "salesman";
+const isSalesmanMode = urlParams.get('mode') === 'salesman';
 
 const CONFIG = {
     WHATSAPP_NUMBER: '919948000452',
@@ -24,12 +25,11 @@ const CONFIG = {
     ORDERS_KEY: 'srk_orders_history',
     PRODUCT_UNIT_KEY: 'srk_product_unit_v1',
     BANNER_AUTO_MS: 5000,
-    // ✅ Paste your deployed Google Apps Script Web App URL here. Leave blank to use local-only shop cache.
     SHOP_SHEET_API_URL: 'https://script.google.com/macros/s/AKfycbyz5XHDYmcx2175Zi46hwOl1Nz1DGTMkyWb58NWcADLW07qP2pOJam0aTuWs_V2r-3X/exec'
 };
 
-// ✅ Shop master cache for salesman mode
 const SHOP_CACHE_KEY = 'srk_shop_master_cache_v1';
+let shopMaster = [];
 
 const state = {
     products: [],
@@ -56,40 +56,17 @@ document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
     showLoader(true);
-if (isSalesmanMode) {
-    const block = document.getElementById("salesmanBlock");
-    if (block) block.style.display = "block";
 
-    const banner = document.getElementById("bannerCarousel");
-    if (banner) banner.style.display = "none";
-   if (isSalesmanMode) {
+    if (isSalesmanMode) {
+        const block = document.getElementById('salesmanBlock');
+        if (block) block.style.display = 'block';
 
-    // ✅ Add Shop Button
-    const addBtn = document.getElementById("addNewShopBtn");
-    if (addBtn) {
-        addBtn.onclick = addNewShop;
+        const banner = document.getElementById('bannerCarousel');
+        if (banner) banner.style.display = 'none';
+
+        setupSalesmanShopMode();
     }
 
-    // ✅ Sync Button
-    const syncBtn = document.getElementById("syncShopsBtn");
-    if (syncBtn) {
-        syncBtn.onclick = loadShopsFromSheet;
-    }
-}
-   
-if (isSalesmanMode) {
-
-    const district = document.getElementById("district");
-    const mandal = document.getElementById("mandal");
-    const village = document.getElementById("village");
-
-    if (district) district.onchange = loadShopsFromSheet;
-    if (mandal) mandal.onchange = loadShopsFromSheet;
-    if (village) village.onchange = loadShopsFromSheet;
-}
-
-}
-   
     // ✅ FIX 1: Wrapped with .catch() — if Google Sheet fails, falls back to PRODUCTS
     state.products = await loadProductsFromGoogleSheet().catch(() => {
         console.warn('SRK: Product load failed, using local fallback');
@@ -854,10 +831,10 @@ function renderCart() {
 
 
 /* ============================================================
-   GOOGLE SHEET SHOP MASTER - SALESMAN MODE
+   SALESMAN SHOP MASTER - GOOGLE SHEET INTEGRATION
+   Single source of truth: Google Sheet.
+   Local storage is used only as a fallback cache.
    ============================================================ */
-let shopMaster = [];
-
 function setSalesmanShopStatus(message, type = 'info') {
     const el = document.getElementById('salesmanShopStatus');
     if (!el) return;
@@ -883,28 +860,82 @@ function saveLocalShopMaster(shops) {
 
 function normalizeShop(s) {
     return {
-        shopId: s.shopId || s.id || `SHOP-${Date.now()}-${Math.floor(Math.random() * 9999)}`,
-        shopName: (s.shopName || s.name || '').trim(),
-        contactPerson: (s.contactPerson || s.ownerName || '').trim(),
+        shopId: s.shopId || s.id || '',
+        shopName: String(s.shopName || s.name || '').trim(),
+        contactPerson: String(s.contactPerson || s.ownerName || '').trim(),
         mobile: String(s.mobile || '').trim(),
-        district: (s.district || '').trim(),
-        mandal: (s.mandal || s.mondal || '').trim(),
-        village: (s.village || '').trim(),
-        address: (s.address || '').trim(),
-        createdAt: s.createdAt || new Date().toISOString(),
-        updatedAt: s.updatedAt || new Date().toISOString()
+        district: String(s.district || '').trim(),
+        mandal: String(s.mandal || s.mondal || '').trim(),
+        village: String(s.village || '').trim(),
+        createdAt: s.createdAt || '',
+        updatedAt: s.updatedAt || ''
     };
 }
 
+function getSelectedSalesLocation() {
+    return {
+        district: (document.getElementById('district')?.value || '').trim(),
+        mandal: (document.getElementById('mandal')?.value || '').trim(),
+        village: (document.getElementById('village')?.value || '').trim()
+    };
+}
+
+function getMatchingShopsForSelectedLocation() {
+    const { district, mandal, village } = getSelectedSalesLocation();
+    if (!district || !mandal || !village) return [];
+
+    return shopMaster
+        .filter(s => s.district === district && s.mandal === mandal && s.village === village)
+        .sort((a, b) => a.shopName.localeCompare(b.shopName));
+}
+
+function renderShopOptions() {
+    if (!isSalesmanMode) return;
+
+    const list = document.getElementById('shopList');
+    if (!list) return;
+
+    list.innerHTML = '';
+    const { district, mandal, village } = getSelectedSalesLocation();
+
+    if (!district || !mandal || !village) {
+        setSalesmanShopStatus('Select district, mandal and village to load shops.');
+        return;
+    }
+
+    const shops = getMatchingShopsForSelectedLocation();
+
+    shops.forEach(shop => {
+        const option = document.createElement('option');
+        option.value = shop.shopName;
+        option.label = [shop.mobile, shop.contactPerson].filter(Boolean).join(' | ');
+        list.appendChild(option);
+    });
+
+    setSalesmanShopStatus(
+        shops.length
+            ? `${shops.length} shop(s) available for selected village.`
+            : 'No shops found for this village. Enter shop details and click + Add New Shop.',
+        shops.length ? 'success' : 'info'
+    );
+}
+
+function resetShopSelection() {
+    const shop = document.getElementById('shop');
+    const contact = document.getElementById('salesContactPerson');
+    const mobile = document.getElementById('salesMobile');
+    if (shop) shop.value = '';
+    if (contact) contact.value = '';
+    if (mobile) mobile.value = '';
+}
+
 function getSelectedShopFromInput() {
-    const name = (document.getElementById('shop')?.value || '').trim().toLowerCase();
-    const district = (document.getElementById('district')?.value || '').trim();
-    const mandal = (document.getElementById('mandal')?.value || '').trim();
-    const village = (document.getElementById('village')?.value || '').trim();
-    if (!name) return null;
+    const shopName = String(document.getElementById('shop')?.value || '').trim();
+    if (!shopName) return null;
+    const { district, mandal, village } = getSelectedSalesLocation();
 
     return shopMaster.find(s =>
-        s.shopName.toLowerCase() === name &&
+        s.shopName.toLowerCase() === shopName.toLowerCase() &&
         s.district === district &&
         s.mandal === mandal &&
         s.village === village
@@ -912,119 +943,54 @@ function getSelectedShopFromInput() {
 }
 
 function autofillShopDetails() {
-    const shop = getSelectedShopFromInput();
-    if (!shop) return;
+    const selected = getSelectedShopFromInput();
+    if (!selected) return;
 
     const contact = document.getElementById('salesContactPerson');
     const mobile = document.getElementById('salesMobile');
-    if (contact && shop.contactPerson) contact.value = shop.contactPerson;
-    if (mobile && shop.mobile) mobile.value = shop.mobile;
-    setSalesmanShopStatus(`Selected: ${shop.shopName}${shop.mobile ? ' | ' + shop.mobile : ''}`, 'success');
+    if (contact && selected.contactPerson) contact.value = selected.contactPerson;
+    if (mobile && selected.mobile) mobile.value = selected.mobile;
+
+    setSalesmanShopStatus(`Selected: ${selected.shopName}${selected.mobile ? ' | ' + selected.mobile : ''}`, 'success');
 }
 
-function loadShopsByLocation() {
-    if (!isSalesmanMode) return;
+async function syncShopsFromGoogleSheet(options = {}) {
+    if (!isSalesmanMode) return [];
 
-    const district = (document.getElementById('district')?.value || '').trim();
-    const mandal = (document.getElementById('mandal')?.value || '').trim();
-    const village = (document.getElementById('village')?.value || '').trim();
-    const list = document.getElementById('shopList');
-    const shopInput = document.getElementById('shop');
-
-    if (!list) return;
-    list.innerHTML = '';
-    if (shopInput) shopInput.value = '';
-
-    if (!district || !mandal || !village) {
-        setSalesmanShopStatus('Select district, mandal and village to load shops.');
-        return;
-    }
-
-    const filtered = shopMaster
-        .filter(s => s.district === district && s.mandal === mandal && s.village === village)
-        .sort((a, b) => a.shopName.localeCompare(b.shopName));
-
-    filtered.forEach(s => {
-        const option = document.createElement('option');
-        option.value = s.shopName;
-        option.label = [s.mobile, s.contactPerson].filter(Boolean).join(' | ');
-        list.appendChild(option);
-    });
-
-    setSalesmanShopStatus(filtered.length ? `${filtered.length} shop(s) loaded for selected village.` : 'No shops found for this village. Type shop details and click + Add New Shop.');
-}
-
-// Used by location-dropdown-integration.js when district/mandal/village changes
-function loadShops() {
-    loadShopsByLocation();
-}
-
-async function syncShopsFromGoogleSheet(force = false) {
-    if (!isSalesmanMode) return;
-
-    const url = CONFIG.SHOP_SHEET_API_URL;
-    if (!url) {
+    if (!CONFIG.SHOP_SHEET_API_URL) {
         shopMaster = getLocalShopMaster();
-        loadShopsByLocation();
-        setSalesmanShopStatus('Google Sheet URL not configured. Using local shop cache only.');
-        return;
+        renderShopOptions();
+        setSalesmanShopStatus('Google Sheet URL not configured. Loaded local cache only.', 'error');
+        return shopMaster;
     }
 
     try {
-        setSalesmanShopStatus('Syncing shops from Google Sheet...');
-        const response = await fetch(`${url}?action=getShops&ts=${Date.now()}`);
-        const data = await response.json();
-        const shops = Array.isArray(data.shops) ? data.shops.map(normalizeShop).filter(s => s.shopName) : [];
-        shopMaster = shops;
-        saveLocalShopMaster(shopMaster);
-        loadShopsByLocation();
-        setSalesmanShopStatus(`Shop master synced. ${shopMaster.length} shop(s) available.`, 'success');
-    } catch (e) {
-        shopMaster = getLocalShopMaster();
-        loadShopsByLocation();
-        setSalesmanShopStatus('Google Sheet sync failed. Loaded local shop cache.', 'error');
-    }
-}
-
-async function postShopToGoogleSheet(shop) {
-    const base = CONFIG.SHOP_SHEET_API_URL;
-
-    const params = new URLSearchParams({
-        action: "addShop",
-        shopName: shop.shopName,
-        contactPerson: shop.contactPerson || "",
-        mobile: shop.mobile || "",
-        district: shop.district,
-        mandal: shop.mandal,
-        village: shop.village
-    });
-
-    const url = base + "?" + params.toString();
-
-    console.log("Saving shop:", url); // ✅ DEBUG
-
-    try {
-        const res = await fetch(url);
+        if (!options.silent) setSalesmanShopStatus('Syncing shops from Google Sheet...');
+        const res = await fetch(`${CONFIG.SHOP_SHEET_API_URL}?action=getShops&ts=${Date.now()}`);
         const data = await res.json();
-        console.log("Response:", data);
-        return data.ok === true;
-    } catch (e) {
-        console.error(e);
-        return false;
+        shopMaster = Array.isArray(data.shops)
+            ? data.shops.map(normalizeShop).filter(s => s.shopName)
+            : [];
+        saveLocalShopMaster(shopMaster);
+        renderShopOptions();
+        if (!options.silent) setSalesmanShopStatus(`Shop master synced. ${shopMaster.length} shop(s) loaded.`, 'success');
+        return shopMaster;
+    } catch (error) {
+        console.error('Shop sync failed:', error);
+        shopMaster = getLocalShopMaster();
+        renderShopOptions();
+        setSalesmanShopStatus('Shop sync failed. Loaded local cache.', 'error');
+        return shopMaster;
     }
 }
-``
-
 
 async function addNewShopFromSalesmanBlock() {
     if (!isSalesmanMode) return;
 
-    const district = (document.getElementById('district')?.value || '').trim();
-    const mandal = (document.getElementById('mandal')?.value || '').trim();
-    const village = (document.getElementById('village')?.value || '').trim();
-    const shopName = (document.getElementById('shop')?.value || '').trim();
-    const contactPerson = (document.getElementById('salesContactPerson')?.value || '').trim();
-    const mobile = (document.getElementById('salesMobile')?.value || '').trim();
+    const { district, mandal, village } = getSelectedSalesLocation();
+    const shopName = String(document.getElementById('shop')?.value || '').trim();
+    const contactPerson = String(document.getElementById('salesContactPerson')?.value || '').trim();
+    const mobile = String(document.getElementById('salesMobile')?.value || '').trim();
 
     if (!district || !mandal || !village) {
         showToast('Please select district, mandal and village', 'error');
@@ -1039,59 +1005,130 @@ async function addNewShopFromSalesmanBlock() {
         return;
     }
 
-    const duplicate = shopMaster.some(s =>
-        s.shopName.toLowerCase() === shopName.toLowerCase() &&
-        s.district === district &&
-        s.mandal === mandal &&
-        s.village === village
-    );
-
-    if (duplicate) {
-        showToast('Shop already exists for this village', 'info');
+    const existing = getSelectedShopFromInput();
+    if (existing) {
         autofillShopDetails();
+        showToast('Shop already exists for this village', 'info');
         return;
     }
 
-    const shop = normalizeShop({
-        shopId: `SHOP-${Date.now()}`,
+    const params = new URLSearchParams({
+        action: 'addShop',
         shopName,
         contactPerson,
         mobile,
         district,
         mandal,
-        village,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        village
     });
 
-    shopMaster.push(shop);
-    saveLocalShopMaster(shopMaster);
-    loadShopsByLocation();
-    const shopInput = document.getElementById('shop');
-    if (shopInput) shopInput.value = shop.shopName;
+    try {
+        setSalesmanShopStatus('Adding shop to Google Sheet...');
+        const res = await fetch(`${CONFIG.SHOP_SHEET_API_URL}?${params.toString()}`);
+        const data = await res.json();
 
-    const posted = await postShopToGoogleSheet(shop);
-    showToast(posted ? 'Shop added and sent to Google Sheet' : 'Shop added locally. Google Sheet not configured/failed.', posted ? 'success' : 'info');
-    setSalesmanShopStatus(posted ? 'Shop added to Google Sheet. Use Sync Shops on other devices.' : 'Shop available locally. Configure Google Sheet URL for team sync.', posted ? 'success' : 'info');
-   await syncShopsFromGoogleSheet();
+        if (!data.ok) {
+            console.error('Add shop response:', data);
+            showToast('Shop could not be added', 'error');
+            setSalesmanShopStatus(data.error || 'Shop could not be added', 'error');
+            return;
+        }
 
+        await syncShopsFromGoogleSheet({ silent: true });
+        const shopInput = document.getElementById('shop');
+        if (shopInput) shopInput.value = shopName;
+        autofillShopDetails();
+
+        showToast(data.duplicate ? 'Shop already exists' : 'Shop added successfully', data.duplicate ? 'info' : 'success');
+        setSalesmanShopStatus(data.duplicate ? 'Shop already exists in Google Sheet.' : 'Shop added and synced.', data.duplicate ? 'info' : 'success');
+    } catch (error) {
+        console.error('Add shop failed:', error);
+        showToast('Shop add failed', 'error');
+        setSalesmanShopStatus('Shop add failed. Check Apps Script URL/deployment.', 'error');
+    }
+}
+
+function loadShops() {
+    // Called by location-dropdown-integration.js when location changes.
+    resetShopSelection();
+    renderShopOptions();
+}
+
+async function onVillageChanged() {
+    const { district, mandal, village } = getSelectedSalesLocation();
+    resetShopSelection();
+    if (!district || !mandal || !village) {
+        renderShopOptions();
+        return;
+    }
+    await syncShopsFromGoogleSheet({ silent: true });
+}
+
+function prefillCheckoutFromSalesmanBlock() {
+    if (!isSalesmanMode) return;
+
+    const selected = getSelectedShopFromInput();
+    const { district, village } = getSelectedSalesLocation();
+    const shopName = String(document.getElementById('shop')?.value || selected?.shopName || '').trim();
+    const contactPerson = String(document.getElementById('salesContactPerson')?.value || selected?.contactPerson || '').trim();
+    const mobile = String(document.getElementById('salesMobile')?.value || selected?.mobile || '').trim();
+
+    const shopEl = document.getElementById('shopName');
+    const contactEl = document.getElementById('contactPerson');
+    const mobileEl = document.getElementById('mobile');
+    const areaEl = document.getElementById('area');
+    const townEl = document.getElementById('town');
+
+    if (shopEl && shopName) shopEl.value = shopName;
+    if (contactEl && contactPerson) contactEl.value = contactPerson;
+    if (mobileEl && mobile) mobileEl.value = mobile;
+    if (areaEl && village) areaEl.value = village;
+    if (townEl && district) townEl.value = district;
+}
+
+function appendSalesmanContextToMessage(msg) {
+    if (!isSalesmanMode) return msg;
+
+    const selected = getSelectedShopFromInput();
+    const { district, mandal, village } = getSelectedSalesLocation();
+    const shopName = String(document.getElementById('shop')?.value || selected?.shopName || '').trim();
+    const contactPerson = String(document.getElementById('salesContactPerson')?.value || selected?.contactPerson || '').trim();
+    const mobile = String(document.getElementById('salesMobile')?.value || selected?.mobile || '').trim();
+
+    if (!shopName && !district && !mandal && !village) return msg;
+
+    msg += `\n\n━━━━━━━━━━━━━━━━━━━━\n🧑‍💼 *SALESMAN / ROUTE DETAILS*\n━━━━━━━━━━━━━━━━━━━━\n`;
+    if (shopName) msg += `🏪 *Selected Shop:* ${shopName}\n`;
+    if (contactPerson) msg += `👤 *Contact Person:* ${contactPerson}\n`;
+    if (mobile) msg += `📞 *Mobile:* ${mobile}\n`;
+    if (village) msg += `📍 *Village:* ${village}\n`;
+    if (mandal) msg += `📍 *Mandal:* ${mandal}\n`;
+    if (district) msg += `📍 *District:* ${district}\n`;
+    return msg;
 }
 
 function setupSalesmanShopMode() {
     if (!isSalesmanMode) return;
 
     shopMaster = getLocalShopMaster();
+    renderShopOptions();
 
     document.getElementById('addNewShopBtn')?.addEventListener('click', addNewShopFromSalesmanBlock);
-    document.getElementById('syncShopsBtn')?.addEventListener('click', () => syncShopsFromGoogleSheet(true));
+    document.getElementById('syncShopsBtn')?.addEventListener('click', () => syncShopsFromGoogleSheet());
     document.getElementById('shop')?.addEventListener('change', autofillShopDetails);
     document.getElementById('shop')?.addEventListener('blur', autofillShopDetails);
 
-    ['district', 'mandal', 'village'].forEach(id => {
-        document.getElementById(id)?.addEventListener('change', loadShopsByLocation);
+    document.getElementById('district')?.addEventListener('change', () => {
+        resetShopSelection();
+        renderShopOptions();
     });
+    document.getElementById('mandal')?.addEventListener('change', () => {
+        resetShopSelection();
+        renderShopOptions();
+    });
+    document.getElementById('village')?.addEventListener('change', onVillageChanged);
 
-    syncShopsFromGoogleSheet();
+    syncShopsFromGoogleSheet({ silent: true });
 }
 
 /* ============================================================
@@ -1101,6 +1138,7 @@ function proceedToCheckout() {
     const { totalUnits } = getCartSummary();
     if (totalUnits === 0) { showToast('Your cart is empty', 'error'); return; }
     closeCart();
+    prefillCheckoutFromSalesmanBlock();
     const modal = document.getElementById('checkoutModal');
     if (modal) { modal.classList.add('show'); document.body.style.overflow = 'hidden'; }
 }
@@ -1109,6 +1147,7 @@ function proceedToCheckout() {
 function proceedToCheckoutDirect() {
     const { totalUnits } = getCartSummary();
     if (totalUnits === 0) { showToast('Your cart is empty', 'error'); return; }
+    prefillCheckoutFromSalesmanBlock();
     const modal = document.getElementById('checkoutModal');
     if (modal) { modal.classList.add('show'); document.body.style.overflow = 'hidden'; }
 }
@@ -1197,68 +1236,6 @@ function submitOrder(event) {
     const form = document.getElementById('checkoutForm');
     if (form) form.reset();
 }
-async function addNewShop() {
-
-    const district = document.getElementById("district")?.value;
-    const mandal = document.getElementById("mandal")?.value;
-    const village = document.getElementById("village")?.value;
-    const shopName = document.getElementById("shop")?.value;
-    const mobile = document.getElementById("salesMobile")?.value || "";
-
-    if (!district || !mandal || !village || !shopName) {
-        alert("Fill all details");
-        return;
-    }
-
-    const url = CONFIG.SHOP_SHEET_API_URL +
-        `?action=addShop` +
-        `&shopName=${encodeURIComponent(shopName)}` +
-        `&mobile=${encodeURIComponent(mobile)}` +
-        `&district=${encodeURIComponent(district)}` +
-        `&mandal=${encodeURIComponent(mandal)}` +
-        `&village=${encodeURIComponent(village)}`;
-
-    console.log("Calling:", url);
-
-    const res = await fetch(url);
-    const data = await res.json();
-
-    console.log("Response:", data);
-
-    alert("Shop added successfully ✅");
-
-    // ✅ auto refresh
-    loadShopsFromSheet();
-}
-async function loadShopsFromSheet() {
-
-    const url = CONFIG.SHOP_SHEET_API_URL + "?action=getShops";
-
-    const res = await fetch(url);
-    const data = await res.json();
-
-    const district = document.getElementById("district")?.value;
-    const mandal = document.getElementById("mandal")?.value;
-    const village = document.getElementById("village")?.value;
-
-    const list = document.getElementById("shopList");
-    list.innerHTML = "";
-
-    data.shops
-        .filter(s =>
-            s.district === district &&
-            s.mandal === mandal &&
-            s.village === village
-        )
-        .forEach(shop => {
-            const option = document.createElement("option");
-            option.value = shop.shopName;
-            list.appendChild(option);
-        });
-
-    console.log("Shops loaded:", data.shops.length);
-}
-
 
 function saveOrderToHistory(order) {
     try {
@@ -1310,6 +1287,7 @@ function buildWhatsAppMessage(retailer) {
     if (retailer.remarks) msg += `\n\uD83D\uDCDD *Remarks:*\n${retailer.remarks}\n`;
     msg += `\n${new Date().toLocaleString('en-IN')}\n`;
     // ✅ FIX 7: Fixed "buisiness" typo → "business"
+    msg = appendSalesmanContextToMessage(msg);
     msg += `*THANK YOU* for choosing *SRK Enterprises* as your business partner`;
 
     return msg;
