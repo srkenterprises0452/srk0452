@@ -1047,6 +1047,8 @@ async function addNewShopFromSalesmanBlock() {
     const posted = await postShopToGoogleSheet(shop);
     showToast(posted ? 'Shop added and sent to Google Sheet' : 'Shop added locally. Google Sheet not configured/failed.', posted ? 'success' : 'info');
     setSalesmanShopStatus(posted ? 'Shop added to Google Sheet. Use Sync Shops on other devices.' : 'Shop available locally. Configure Google Sheet URL for team sync.', posted ? 'success' : 'info');
+   await syncShopsFromGoogleSheet();
+
 }
 
 function setupSalesmanShopMode() {
