@@ -974,8 +974,18 @@ async function syncShopsFromFirebase(options = {}) {
             setSalesmanShopStatus("Loading shops from Firebase...");
         }
 
-        const snapshot = await fb.getDocs(
-            fb.collection(fb.db, "shops")
+
+const { district, mandal, village } = getSelectedSalesLocation();
+
+const q = fb.query(
+    fb.collection(fb.db, "shops"),
+    fb.where("district", "==", district),
+    fb.where("mandal", "==", mandal),
+    fb.where("village", "==", village)
+);
+
+const snapshot = await fb.getDocs(q);
+
         );
 
         shopMaster = snapshot.docs.map(doc => ({
