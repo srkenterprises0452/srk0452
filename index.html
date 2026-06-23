@@ -67,6 +67,36 @@
             </div>
         </div>
     </header>
+    <!-- ✅ SALESMAN MODE BLOCK -->
+<div id="salesmanBlock" style="display:none; padding:10px; background:#f8f9fa; border-bottom:1px solid #ddd;">
+
+    <select id="district" style="width:100%; margin-bottom:5px;"></select>
+
+    <select id="mandal" style="width:100%; margin-bottom:5px;"></select>
+
+    <select id="village" style="width:100%; margin-bottom:5px;"></select>
+
+    <input list="shopList" id="shop" placeholder="Select Shop"
+           style="width:100%; margin-bottom:5px;" />
+
+    <datalist id="shopList"></datalist>
+
+    <input type="text" id="salesContactPerson" placeholder="Contact Person"
+           style="width:100%; margin-bottom:5px;" />
+
+    <input type="tel" id="salesMobile" placeholder="Mobile Number"
+           maxlength="10" inputmode="numeric"
+           style="width:100%; margin-bottom:5px;" />
+
+    <button id="addNewShopBtn" type="button" style="width:100%; margin-bottom:5px;">
+        ➕ Add New Shop
+    </button>
+
+    <button id="syncShopsBtn" type="button" style="width:100%;">
+        🔄 Sync Shops
+    </button>
+
+</div>
 
     <!-- ========== DUAL FILTERS ========== -->
     <div class="filters-wrap">
