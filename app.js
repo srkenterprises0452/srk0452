@@ -14,6 +14,10 @@
 */
 'use strict';
 
+// ✅ Dual-mode support: normal retailer mode = index.html, salesman mode = index.html?mode=salesman
+const urlParams = new URLSearchParams(window.location.search);
+const isSalesmanMode = urlParams.get('mode') === 'salesman';
+
 const CONFIG = {
     WHATSAPP_NUMBER: '919948000452',
     CART_KEY: 'srk_cart_v2',
@@ -48,6 +52,15 @@ document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
     showLoader(true);
+
+    // ✅ Salesman mode UI: show location/shop block and hide banner to keep order-taking focused
+    if (isSalesmanMode) {
+        const block = document.getElementById('salesmanBlock');
+        if (block) block.style.display = 'block';
+
+        const banner = document.getElementById('bannerCarousel');
+        if (banner) banner.style.display = 'none';
+    }
 
     // ✅ FIX 1: Wrapped with .catch() — if Google Sheet fails, falls back to PRODUCTS
     state.products = await loadProductsFromGoogleSheet().catch(() => {
@@ -719,6 +732,7 @@ function updateCartUI() {
 function openCart() {
     renderCart();
     const modal = document.getElementById('cartModal');
+    prefillCheckoutFromSalesmanBlock();
     if (modal) { modal.classList.add('show'); document.body.style.overflow = 'hidden'; }
 }
 
@@ -811,6 +825,58 @@ function renderCart() {
         </button>`;
 }
 
+
+/* ============================================================
+   SALESMAN MODE HELPERS
+   ============================================================ */
+function getSalesmanContext() {
+    if (!isSalesmanMode) return null;
+
+    return {
+        shop: (document.getElementById('shop')?.value || '').trim(),
+        contactPerson: (document.getElementById('salesContactPerson')?.value || '').trim(),
+        mobile: (document.getElementById('salesMobile')?.value || '').trim(),
+        district: (document.getElementById('district')?.value || '').trim(),
+        mandal: (document.getElementById('mandal')?.value || '').trim(),
+        village: (document.getElementById('village')?.value || '').trim()
+    };
+}
+
+function prefillCheckoutFromSalesmanBlock() {
+    const ctx = getSalesmanContext();
+    if (!ctx) return;
+
+    const shopName = document.getElementById('shopName');
+    const contactPerson = document.getElementById('contactPerson');
+    const mobile = document.getElementById('mobile');
+    const area = document.getElementById('area');
+    const town = document.getElementById('town');
+
+    if (shopName && ctx.shop) shopName.value = ctx.shop;
+    if (contactPerson && ctx.contactPerson) contactPerson.value = ctx.contactPerson;
+    if (mobile && ctx.mobile) mobile.value = ctx.mobile;
+    if (area && ctx.village) area.value = ctx.village;
+    if (town && ctx.district) town.value = ctx.district;
+}
+
+function appendSalesmanContextToMessage(msg) {
+    const ctx = getSalesmanContext();
+    if (!ctx) return msg;
+
+    const hasAny = ctx.shop || ctx.contactPerson || ctx.mobile || ctx.district || ctx.mandal || ctx.village;
+    if (!hasAny) return msg;
+
+    msg += `\n\n━━━━━━━━━━━━━━━━━━━━\n🧑‍💼 *SALESMAN / ROUTE DETAILS*\n━━━━━━━━━━━━━━━━━━━━\n`;
+    if (ctx.shop) msg += `🏪 *Selected Shop:* ${ctx.shop}\n`;
+    if (ctx.contactPerson) msg += `👤 *Contact Person:* ${ctx.contactPerson}\n`;
+    if (ctx.mobile) msg += `📞 *Mobile:* ${ctx.mobile}\n`;
+    if (ctx.village) msg += `📍 *Village:* ${ctx.village}\n`;
+    if (ctx.mandal) msg += `📍 *Mandal:* ${ctx.mandal}\n`;
+    if (ctx.district) msg += `📍 *District:* ${ctx.district}\n`;
+
+    return msg;
+}
+
 /* ============================================================
    CHECKOUT
    ============================================================ */
@@ -827,6 +893,7 @@ function proceedToCheckoutDirect() {
     const { totalUnits } = getCartSummary();
     if (totalUnits === 0) { showToast('Your cart is empty', 'error'); return; }
     const modal = document.getElementById('checkoutModal');
+    prefillCheckoutFromSalesmanBlock();
     if (modal) { modal.classList.add('show'); document.body.style.overflow = 'hidden'; }
 }
 
@@ -966,6 +1033,8 @@ function buildWhatsAppMessage(retailer) {
     msg += `\n${new Date().toLocaleString('en-IN')}\n`;
     // ✅ FIX 7: Fixed "buisiness" typo → "business"
     msg += `*THANK YOU* for choosing *SRK Enterprises* as your business partner`;
+
+    msg = appendSalesmanContextToMessage(msg);
 
     return msg;
 }
