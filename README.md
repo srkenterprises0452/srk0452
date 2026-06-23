@@ -1,212 +1,343 @@
-# SRK Enterprises - B2B FMCG Ordering Portal v5.0
+# ✅ **SRK Enterprises – B2B FMCG Ordering Portal**
 
-> **Connecting Markets, Creating Futures**
-> Professional B2B FMCG distribution portal with brand & banner management.
+A **mobile-first B2B FMCG ordering platform** designed for retailers and field sales teams.
 
-## 🆕 What's New in v5.0
+Supports:
 
-### Core Features
-- 🏷️ **Brand Management** - Add/Edit/Delete brands via admin (currently: Reliance Independence + Surya Masale)
-- 🖼️ **Banner Carousel** - Up to 3 admin-managed banners with auto-rotation
-- 🌐 **Telugu Names** - All 36 products have optional Telugu translations
-- 📦 **Carton + Single Pricing** - B2B-grade pricing with separate carton/single options
-- 🔍 **Dual Filter** - Brand → Category sequence with smart hide
-- 📊 **Order History** - All WhatsApp orders saved to admin dashboard
-- 🎨 **Heart Wishlist** - Customers can mark favorites
+* ✅ Retailer self-ordering (public access)
+* ✅ Salesman-assisted ordering (route-based)
+* ✅ Google Sheet–based shop master
+* ✅ WhatsApp order workflow
 
-### Pricing Logic
-- **Single + Carton enabled**: Single = flat price, Carton = slab pricing (1-4 / 5-9 / 10+)
-- **Single only**: Slab pricing on pieces (1-4 / 5-9 / 10+)
-- **Carton only**: Slab pricing on cartons
-- **Mixed cart**: Customer can buy both single + carton of same product
+***
 
-## 📁 Files Included
+# 🚀 **Live Usage**
+
+## 🟦 Retailer Mode (Default)
 
 ```
-SRK_Enterprises_Portal/
-├── index.html              Retailer portal (with carousel, mobile fixes)
-├── admin.html              Admin panel (sidebar layout)
-├── style.css               Portal stylesheet
-├── app.js                  Portal logic (carousel, filters, cart)
-├── products.js             36 products + brands + banners catalogue
-├── logo-circle.png         Round logo (favicon + header)
-├── banner-1.jpg            SRK Enterprises brand banner (slide 1)
-├── banner-2.jpg            Independence products photo (slide 2)
-└── README.md               This file
+index.html
 ```
 
-## 🚀 Quick Start
+Features:
 
-1. Extract the folder
-2. Double-click `index.html` for retailer portal
-3. Double-click `admin.html` for admin panel
-4. **Admin password:** `srk@admin2026` (change after first login)
+* Browse products
+* Apply filters (Brand / Category)
+* Search products
+* Add to cart
+* Checkout
+* Order via WhatsApp
 
-## 🎨 Color Palette (Matching Logo)
+***
 
-| Color | Hex | Usage |
-|---|---|---|
-| Navy Blue | `#1E3A8A` | Header text, primary buttons, prices |
-| Deep Navy | `#0F1F5C` | Sidebar background, gradients |
-| Vibrant Orange | `#F97316` | "My Cart" button, discount badges, secondary |
-| Fresh Green | `#16A34A` | In-stock badges, success, accent |
-| Cream | `#FFF7ED` | Price slab background |
-| Background | `#F8FAFC` | Clean light background |
-| WhatsApp Green | `#25D366` | WhatsApp/checkout buttons |
-
-## 📦 Product Data Structure (v5.0)
-
-```js
-{
-  id: 'oil-001',
-  category: 'Edible Oil',
-  brand: 'Reliance Independence',
-  name: 'Reliance Independence Sunflower Oil',
-  nameTelugu: 'రిలయన్స్ ఇండిపెండెన్స్ సన్‌ఫ్లవర్ ఆయిల్',
-  packSize: '1L Pouch',
-  image: '',
-  emoji: '🌻',
-  
-  // Sale options
-  allowSingle: true,
-  allowCarton: true,
-  defaultUnit: 'carton',  // 'single' | 'carton'
-  
-  // Single pricing
-  singleMrp: 175,
-  singlePrice: 150,              // Flat when both enabled
-  singlePrice_1_4: 150,          // Slabs when only single
-  singlePrice_5_9: 145,
-  singlePrice_10_plus: 140,
-  
-  // Carton pricing
-  cartonType: 'Carton',          // 'Carton' | 'Bag' | 'Box' | 'Case'
-  unitsPerCarton: 12,
-  cartonMrp: 2100,
-  cartonPrice_1_4: 1680,
-  cartonPrice_5_9: 1620,
-  cartonPrice_10_plus: 1560,
-  
-  description: 'Carton contains 12 x 1L bottles',
-  stockStatus: 'in'
-}
-```
-
-## 🏷️ Brand Management
-
-Default brands:
-- **Reliance Independence** (30 products: Edible Oil, Atta, Salt, Rice, Ghee)
-- **Surya Masale** (6 products: Spices)
-
-### Via Admin Panel:
-1. Login → Click "Brands" in sidebar
-2. Add Brand: Enter name, Telugu name, logo URL, mark featured
-3. Edit: Click pencil icon
-4. Delete: Click trash (only if no products use this brand)
-
-## 🖼️ Banner Management
-
-Max 3 banners. Each banner has:
-- Title + Subtitle (optional)
-- Image URL or base64 upload (max 500KB)
-- Background gradient (fallback)
-- Button text
-- Active toggle
-- Display order (1-3)
-- Use overlay toggle (show text on image)
-
-### Default Banners:
-1. **Slide 1**: SRK Enterprises brand banner (no overlay - image speaks for itself)
-2. **Slide 2**: Reliance Independence products with overlay text
-
-## 🌐 Telugu Language
-
-All 36 default products have Telugu names auto-translated. To add Telugu to a custom product:
-1. Admin Panel → Products → Add/Edit
-2. Fill "Product Name (Telugu)" field
-3. Save
-
-Categories in Telugu (auto-applied):
-- Edible Oil → నూనెలు
-- Atta → పిండి
-- Salt → ఉప్పు
-- Rice → బియ్యం
-- Ghee → నెయ్యి
-- Spices → మసాలాలు
-
-## 💬 WhatsApp Order Format (v5.0)
+## 🟩 Salesman Mode
 
 ```
-*SRK ENTERPRISES ORDER*
-━━━━━━━━━━━━━━━━━━━━━━
-
-*Retailer:* ABC Stores
-*Mobile:* 9876543210
-
-━━━━━━━━━━━━━━━━━━━━━━
-
-1. *Reliance Independence Sunflower Oil*
-   రిలయన్స్ ఇండిపెండెన్స్ సన్‌ఫ్లవర్ ఆయిల్
-   Order: 5 Cartons (60 units)
-   Rate: ₹1,620/carton
-   Amount: ₹8,100
-
-2. *Surya Masale Turmeric Powder*
-   సూర్య మసాలే పసుపు పొడి
-   Order: 10 pcs (single)
-   Rate: ₹170/pc
-   Amount: ₹1,700
-
-━━━━━━━━━━━━━━━━━━━━━━
-*Cartons/Bags:* 5
-*Single Pieces:* 10
-*Total Items:* 15
-*GRAND TOTAL: ₹9,800*
-━━━━━━━━━━━━━━━━━━━━━━
+index.html?mode=salesman
 ```
 
-## 🛠️ Admin Panel Tabs
+Additional capabilities:
 
-| Tab | Purpose |
-|---|---|
-| Dashboard | Stats, donut chart by brand, recent orders |
-| Products | Add/Edit/Delete with carton+single pricing |
-| Brands | Add/Edit/Delete brands with logo + Telugu |
-| Banners | Manage up to 3 banner slides |
-| Orders | View all WhatsApp orders received |
-| Categories | View product distribution by category |
-| Import / Export | Download CSV / products.js / reset defaults |
-| Settings | Configure WhatsApp number |
-| Change Password | Update admin password |
+* Select:
+  * District
+  * Mandal
+  * Village
+* Load shops from Google Sheet
+* Add new shop
+* Sync shops across devices
+* Auto-fill retailer details
+* Checkout with location context
 
-## 🚀 Hosting on GitHub Pages
+***
 
-1. Create GitHub repository (public)
-2. Upload all 9 files
-3. Settings → Pages → Source: main branch → /(root)
-4. Live URL: `https://yourusername.github.io/repo-name/`
+# 🧩 **Core Architecture**
 
-## 📱 Tested On
+### ✅ Single Page Application
 
-- Chrome / Safari / Firefox / Edge (latest)
-- iOS Safari, Android Chrome
-- Tablet, Desktop, Mobile (responsive)
+```
+index.html → handles both modes
+```
 
-## 📞 Contact
+### ✅ Separation of Concerns
 
-- **Phone:** +91 99480 00452
-- **WhatsApp:** https://wa.me/919948000452
-- **Service Area:** Rajanna Sircilla & Siddipet (FMCG Channel Partner)
+| File                               | Responsibility          |
+| ---------------------------------- | ----------------------- |
+| `index.html`                       | UI layout               |
+| `app.js`                           | Business logic          |
+| `products.js`                      | Product catalog         |
+| `locations.js`                     | Location master         |
+| `location-dropdown-integration.js` | Location dropdown logic |
+| `style.css`                        | Styles                  |
 
----
+***
 
-© SRK Enterprises. All Rights Reserved.
+# 🔗 **Shop Master System (Google Sheet)**
 
+## ✅ Source of Truth
 
-### v5.1 Fixes Applied
-- Correct round logo bundled
-- Mobile banner centering and overflow fixes
-- Mobile cart modal overflow fixes
-- Contact section location removed
-- Default admin password updated to `Rajanna@0452`
-- Default password is no longer shown in the admin UI
+Google Sheet stores all shops.
+
+***
+
+## ✅ API (Apps Script)
+
+### Get Shops
+
+```
+?action=getShops
+```
+
+### Add Shop
+
+```
+?action=addShop
+```
+
+***
+
+## ✅ Shop Structure
+
+| Field         | Description   |
+| ------------- | ------------- |
+| shopId        | Unique ID     |
+| shopName      | Shop name     |
+| contactPerson | Owner/contact |
+| mobile        | Phone number  |
+| district      | District      |
+| mandal        | Mandal        |
+| village       | Village       |
+| createdAt     | Timestamp     |
+
+***
+
+## ✅ Duplicate Rule
+
+A shop is considered duplicate if:
+
+```
+shopName + district + mandal + village match
+```
+
+Handled in:
+
+* ✅ Frontend (`app.js`)
+* ✅ Backend (Apps Script)
+
+***
+
+# 🔁 **Shop Loading Flow (Final Architecture)**
+
+### Event-Based Architecture
+
+```
+Location selected
+    ↓
+location-dropdown-integration.js
+    ↓
+Dispatch event → srkLocationChanged
+    ↓
+app.js listens
+    ↓
+Load shops from Google Sheet
+    ↓
+Filter → populate dropdown
+```
+
+***
+
+# 📦 **Product System**
+
+Features:
+
+* Brand + Category filters
+* Telugu + English product names
+* Image fallback (emoji)
+* Mobile-optimized layout
+
+***
+
+## 💰 Pricing Model
+
+Supports:
+
+* ✅ Single (pcs)
+* ✅ Carton
+
+### Tier Pricing:
+
+```
+1–4 units
+5–9 units
+10+ units
+```
+
+***
+
+# 🛒 **Cart System**
+
+* Add/remove items
+* Quantity control
+* Unit-based cart
+* Dynamic pricing
+* Savings calculation
+
+***
+
+# 📋 **Checkout System**
+
+## Fields:
+
+* Shop Name
+* Contact Person
+* Mobile
+* Area
+* Town
+* Remarks
+
+***
+
+## ✅ Salesman Mode Enhancements
+
+Auto-filled from selected shop:
+
+* Shop name
+* Contact person
+* Mobile
+* Area (Village)
+* Town (District)
+
+***
+
+# 📲 **WhatsApp Order Flow**
+
+### Final Output:
+
+* Opens WhatsApp with prefilled order
+* Includes:
+
+```
+Shop details
+Product list
+Quantity
+Pricing
+Totals
+```
+
+***
+
+## ✅ Salesman Context Added
+
+```
+Village
+Mandal
+District
+Selected shop
+```
+
+***
+
+# 💾 **Data Storage**
+
+| Data        | Storage      |
+| ----------- | ------------ |
+| Cart        | localStorage |
+| Wishlist    | localStorage |
+| Shop cache  | localStorage |
+| Orders      | localStorage |
+| Shop master | Google Sheet |
+
+***
+
+# ⚙️ **Configuration**
+
+Update in `app.js`:
+
+```javascript
+SHOP_SHEET_API_URL: "YOUR_APPS_SCRIPT_EXEC_URL"
+```
+
+***
+
+# 🧹 **Project Structure**
+
+```
+/root
+├── index.html
+├── app.js
+├── products.js
+├── locations.js
+├── location-dropdown-integration.js
+├── style.css
+├── logo-circle.png
+├── banner-1.jpg
+├── banner-2.jpg
+└── README.md
+```
+
+***
+
+# ✅ **Pre-Deployment Checklist**
+
+* [ ] Remove old files (`salesman.html`, `salesman.js`, `salesman.css`)
+* [ ] Ensure only one `app.js`
+* [ ] Apps Script deployed (`/exec`)
+* [ ] Hard refresh browser (`Ctrl + Shift + R`)
+* [ ] Test both modes
+
+***
+
+# ✅ **End-to-End Test**
+
+### Retail Mode
+
+```
+Browse → Add → Checkout → WhatsApp ✅
+```
+
+***
+
+### Salesman Mode
+
+```
+Select location
+→ Load shops ✅
+→ Select or add shop ✅
+→ Add products ✅
+→ Checkout ✅
+→ WhatsApp ✅
+```
+
+***
+
+# 📌 **Version**
+
+```
+v1.0 – Stable Dual Mode Architecture
+```
+
+Includes:
+
+* ✅ Event-driven shop loading
+* ✅ Google Sheet integration
+* ✅ Duplicate-safe shop addition
+* ✅ Clean single-page design
+
+***
+
+# 👨‍💻 **Author**
+
+SRK Enterprises  
+FMCG Distribution – Telangana (Siddipet & Rajanna Sircilla)
+
+***
+
+# ✅ ✅ FINAL NOTE
+
+This version is:
+
+✔ Stable  
+✔ Scalable  
+✔ Clean architecture  
+✔ Ready for field usage
+
+***
