@@ -965,17 +965,26 @@ async function postShopToGoogleSheet(shop) {
     if (!url) return false;
 
     try {
-        await fetch(url, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'addShop', shop })
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                action: "addShop",
+                shop: shop
+            })
         });
-        return true;
+
+        const result = await response.json();
+
+        return result.ok === true;
     } catch (e) {
+        console.error("Shop save error:", e);
         return false;
     }
 }
+
 
 async function addNewShopFromSalesmanBlock() {
     if (!isSalesmanMode) return;
