@@ -962,25 +962,23 @@ async function syncShopsFromGoogleSheet(force = false) {
 
 async function postShopToGoogleSheet(shop) {
     const url = CONFIG.SHOP_SHEET_API_URL;
-    if (!url) return false;
+
+    const params = new URLSearchParams({
+        action: "addShop",
+        shopName: shop.shopName,
+        contactPerson: shop.contactPerson || "",
+        mobile: shop.mobile || "",
+        district: shop.district,
+        mandal: shop.mandal,
+        village: shop.village
+    });
 
     try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                action: "addShop",
-                shop: shop
-            })
-        });
-
-        const result = await response.json();
-
-        return result.ok === true;
+        const res = await fetch(url + "?" + params.toString());
+        const data = await res.json();
+        return data.ok === true;
     } catch (e) {
-        console.error("Shop save error:", e);
+        console.error(e);
         return false;
     }
 }
