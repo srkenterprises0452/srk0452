@@ -1009,67 +1009,75 @@ async function syncShopsFromFirebase(options = {}) {
 async function addNewShopFromSalesmanBlock() {
     if (!isSalesmanMode) return;
 
+    const fb = getFirebase();
+    if (!fb) return;
+
     const { district, mandal, village } = getSelectedSalesLocation();
-    const shopName = String(document.getElementById('shop')?.value || '').trim();
-    const contactPerson = String(document.getElementById('salesContactPerson')?.value || '').trim();
-    const mobile = String(document.getElementById('salesMobile')?.value || '').trim();
+
+    const shopName = String(document.getElementById("shop")?.value || "").trim();
+    const contactPerson = String(document.getElementById("salesContactPerson")?.value || "").trim();
+    const mobile = String(document.getElementById("salesMobile")?.value || "").trim();
 
     if (!district || !mandal || !village) {
-        showToast('Please select district, mandal and village', 'error');
-        return;
-    }
-    if (!shopName) {
-        showToast('Please enter shop name', 'error');
-        return;
-    }
-    if (mobile && !/^[6-9]\d{9}$/.test(mobile)) {
-        showToast('Please enter valid 10-digit mobile number', 'error');
+        showToast("Please select district, mandal and village", "error");
         return;
     }
 
+    if (!shopName) {
+        showToast("Please enter shop name", "error");
+        return;
+    }
+
+    if (mobile && !/^[6-9]\d{9}$/.test(mobile)) {
+        showToast("Please enter valid 10-digit mobile number", "error");
+        return;
+    }
+
+    // Frontend duplicate check
     const existing = getSelectedShopFromInput();
+
     if (existing) {
         autofillShopDetails();
-        showToast('Shop already exists for this village', 'info');
+        showToast("Shop already exists for this village", "info");
+        setSalesmanShopStatus("Shop already exists for selected village.", "info");
         return;
     }
 
-    const params = new URLSearchParams({
-        action: 'addShop',
-        shopName,
-        contactPerson,
-        mobile,
-        district,
-        mandal,
-        village
-    });
-
     try {
-        setSalesmanShopStatus('Adding shop to Google Sheet...');
-        const res = await fetch(`${CONFIG.SHOP_SHEET_API_URL}?${params.toString()}`);
-        const data = await res.json();
+        setSalesmanShopStatus("Adding shop to Firebase...");
 
-        if (!data.ok) {
-            console.error('Add shop response:', data);
-            showToast('Shop could not be added', 'error');
-            setSalesmanShopStatus(data.error || 'Shop could not be added', 'error');
-            return;
-        }
+        await fb.addDoc(
+            fb.collection(fb.db, "shops"),
+            {
+                shopId: "SHOP-" + Date.now(),
+                shopName,
+                contactPerson,
+                mobile,
+                district,
+                mandal,
+                village,
+                source: "web_app",
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            }
+        );
 
-        await syncShopsFromGoogleSheet({ silent: true });
-        const shopInput = document.getElementById('shop');
+        await syncShopsFromFirebase({ silent: true });
+
+        const shopInput = document.getElementById("shop");
         if (shopInput) shopInput.value = shopName;
+
         autofillShopDetails();
 
-        showToast(data.duplicate ? 'Shop already exists' : 'Shop added successfully', data.duplicate ? 'info' : 'success');
-        setSalesmanShopStatus(data.duplicate ? 'Shop already exists in Google Sheet.' : 'Shop added and synced.', data.duplicate ? 'info' : 'success');
+        showToast("Shop added successfully", "success");
+        setSalesmanShopStatus("Shop added and synced from Firebase.", "success");
+
     } catch (error) {
-        console.error('Add shop failed:', error);
-        showToast('Shop add failed', 'error');
-        setSalesmanShopStatus('Shop add failed. Check Apps Script URL/deployment.', 'error');
+        console.error("Firebase add shop failed:", error);
+        showToast("Shop add failed", "error");
+        setSalesmanShopStatus("Shop add failed. Check Firebase rules/config.", "error");
     }
 }
-
 function loadShops() {
     // Called by location-dropdown-integration.js when location changes.
     resetShopSelection();
@@ -1136,7 +1144,7 @@ function setupSalesmanShopMode() {
     renderShopOptions();
 
     document.getElementById('addNewShopBtn')?.addEventListener('click', addNewShopFromSalesmanBlock);
-    document.getElementById('syncShopsBtn')?.addEventListener('click', () => syncShopsFromGoogleSheet());
+    document.getElementById('syncShopsBtn')?.addEventListener('click', () => syncShopsFromFirebase());
     document.getElementById('shop')?.addEventListener('change', autofillShopDetails);
     document.getElementById('shop')?.addEventListener('blur', autofillShopDetails);
 
@@ -1150,7 +1158,7 @@ function setupSalesmanShopMode() {
     });
     document.getElementById('village')?.addEventListener('change', onVillageChanged);
 
-    syncShopsFromGoogleSheet({ silent: true });
+    syncShopsFromFirebase({ silent: true });
 }
 
 /* ============================================================
