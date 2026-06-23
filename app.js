@@ -27,6 +27,8 @@ const CONFIG = {
     BANNER_AUTO_MS: 5000,
     SHOP_SHEET_API_URL: 'https://script.google.com/macros/s/AKfycbyz5XHDYmcx2175Zi46hwOl1Nz1DGTMkyWb58NWcADLW07qP2pOJam0aTuWs_V2r-3X/exec'
 };
+const SHOP_BACKEND = "firebase";
+let shopMasterSynced = false;
 
 const SHOP_CACHE_KEY = 'srk_shop_master_cache_v1';
 let shopMaster = [];
@@ -828,7 +830,15 @@ function renderCart() {
             Proceed to Checkout &#8594;
         </button>`;
 }
+function getFirebase() {
+    if (!window.SRK_FB || !window.SRK_FB.db) {
+        console.error("Firebase not loaded. window.SRK_FB is missing.");
+        setSalesmanShopStatus("Firebase not loaded. Please refresh.", "error");
+        return null;
+    }
 
+    return window.SRK_FB;
+}
 
 /* ============================================================
    SALESMAN SHOP MASTER - GOOGLE SHEET INTEGRATION
@@ -954,32 +964,44 @@ function autofillShopDetails() {
     setSalesmanShopStatus(`Selected: ${selected.shopName}${selected.mobile ? ' | ' + selected.mobile : ''}`, 'success');
 }
 
-async function syncShopsFromGoogleSheet(options = {}) {
+async function syncShopsFromFirebase(options = {}) {
     if (!isSalesmanMode) return [];
 
-    if (!CONFIG.SHOP_SHEET_API_URL) {
-        shopMaster = getLocalShopMaster();
-        renderShopOptions();
-        setSalesmanShopStatus('Google Sheet URL not configured. Loaded local cache only.', 'error');
-        return shopMaster;
-    }
+    const fb = getFirebase();
+    if (!fb) return [];
 
     try {
-        if (!options.silent) setSalesmanShopStatus('Syncing shops from Google Sheet...');
-        const res = await fetch(`${CONFIG.SHOP_SHEET_API_URL}?action=getShops&ts=${Date.now()}`);
-        const data = await res.json();
-        shopMaster = Array.isArray(data.shops)
-            ? data.shops.map(normalizeShop).filter(s => s.shopName)
-            : [];
+        if (!options.silent) {
+            setSalesmanShopStatus("Loading shops from Firebase...");
+        }
+
+        const snapshot = await fb.getDocs(
+            fb.collection(fb.db, "shops")
+        );
+
+        shopMaster = snapshot.docs.map(doc => ({
+            firebaseId: doc.id,
+            ...doc.data()
+        }));
+
+        shopMasterSynced = true;
         saveLocalShopMaster(shopMaster);
         renderShopOptions();
-        if (!options.silent) setSalesmanShopStatus(`Shop master synced. ${shopMaster.length} shop(s) loaded.`, 'success');
+
+        if (!options.silent) {
+            setSalesmanShopStatus(`${shopMaster.length} shop(s) loaded from Firebase.`, "success");
+        }
+
         return shopMaster;
+
     } catch (error) {
-        console.error('Shop sync failed:', error);
+        console.error("Firebase shop sync failed:", error);
+
         shopMaster = getLocalShopMaster();
+        shopMasterSynced = true;
         renderShopOptions();
-        setSalesmanShopStatus('Shop sync failed. Loaded local cache.', 'error');
+
+        setSalesmanShopStatus("Firebase sync failed. Loaded local cache.", "error");
         return shopMaster;
     }
 }
