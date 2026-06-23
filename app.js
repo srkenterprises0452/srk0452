@@ -994,7 +994,6 @@ const q = fb.query(
 
 const snapshot = await fb.getDocs(q);
 
-        );
 
         shopMaster = snapshot.docs.map(doc => ({
             firebaseId: doc.id,
