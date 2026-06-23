@@ -1185,6 +1185,68 @@ function submitOrder(event) {
     const form = document.getElementById('checkoutForm');
     if (form) form.reset();
 }
+async function addNewShop() {
+
+    const district = document.getElementById("district")?.value;
+    const mandal = document.getElementById("mandal")?.value;
+    const village = document.getElementById("village")?.value;
+    const shopName = document.getElementById("shop")?.value;
+    const mobile = document.getElementById("salesMobile")?.value || "";
+
+    if (!district || !mandal || !village || !shopName) {
+        alert("Fill all details");
+        return;
+    }
+
+    const url = CONFIG.SHOP_SHEET_API_URL +
+        `?action=addShop` +
+        `&shopName=${encodeURIComponent(shopName)}` +
+        `&mobile=${encodeURIComponent(mobile)}` +
+        `&district=${encodeURIComponent(district)}` +
+        `&mandal=${encodeURIComponent(mandal)}` +
+        `&village=${encodeURIComponent(village)}`;
+
+    console.log("Calling:", url);
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    console.log("Response:", data);
+
+    alert("Shop added successfully ✅");
+
+    // ✅ auto refresh
+    loadShopsFromSheet();
+}
+async function loadShopsFromSheet() {
+
+    const url = CONFIG.SHOP_SHEET_API_URL + "?action=getShops";
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const district = document.getElementById("district")?.value;
+    const mandal = document.getElementById("mandal")?.value;
+    const village = document.getElementById("village")?.value;
+
+    const list = document.getElementById("shopList");
+    list.innerHTML = "";
+
+    data.shops
+        .filter(s =>
+            s.district === district &&
+            s.mandal === mandal &&
+            s.village === village
+        )
+        .forEach(shop => {
+            const option = document.createElement("option");
+            option.value = shop.shopName;
+            list.appendChild(option);
+        });
+
+    console.log("Shops loaded:", data.shops.length);
+}
+
 
 function saveOrderToHistory(order) {
     try {
