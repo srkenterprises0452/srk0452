@@ -285,15 +285,16 @@
     <div id="imageZoomModal" class="image-zoom-modal" onclick="closeImageZoom()">
         <img id="zoomedImage" src="" alt="Product zoom" />
     </div>
-<script src="products.js"></script>
-<script src="locations.js"></script>
-<script src="location-dropdown-integration.js"></script>
 
-<!-- ✅ Firebase config -->
-<script type="module" src="firebase-config.js"></script>
+<script src="products.js?v=30"></script>
+<script src="locations.js?v=30"></script>
+<script src="location-dropdown-integration.js?v=30"></script>
 
-<!-- ✅ Main app (must be module) -->
-<script type="module" src="app.js"></script>
+<!-- Firebase config only is module -->
+<script type="module" src="firebase-config.js?v=1"></script>
+
+<!-- Keep app.js normal because HTML uses inline onclick functions -->
+<script src="app.js?v=31"></script>
 ``
 </body>
 </html>
