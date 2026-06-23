@@ -13,6 +13,9 @@
    11. Cart cleared after successful order submission
 */
 'use strict';
+// ✅ SALESMAN MODE DETECTION
+const urlParams = new URLSearchParams(window.location.search);
+const isSalesmanMode = urlParams.get("mode") === "salesman";
 
 const CONFIG = {
     WHATSAPP_NUMBER: '919948000452',
