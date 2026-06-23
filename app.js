@@ -961,7 +961,7 @@ async function syncShopsFromGoogleSheet(force = false) {
 }
 
 async function postShopToGoogleSheet(shop) {
-    const url = CONFIG.SHOP_SHEET_API_URL;
+    const base = CONFIG.SHOP_SHEET_API_URL;
 
     const params = new URLSearchParams({
         action: "addShop",
@@ -973,15 +973,21 @@ async function postShopToGoogleSheet(shop) {
         village: shop.village
     });
 
+    const url = base + "?" + params.toString();
+
+    console.log("Saving shop:", url); // ✅ DEBUG
+
     try {
-        const res = await fetch(url + "?" + params.toString());
+        const res = await fetch(url);
         const data = await res.json();
+        console.log("Response:", data);
         return data.ok === true;
     } catch (e) {
         console.error(e);
         return false;
     }
 }
+``
 
 
 async function addNewShopFromSalesmanBlock() {
